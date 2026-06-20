@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fluxo de Caixa | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --red-bd:     #f1a9a0;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --amber-bd:   #f5d08a;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* Header */
+    .site-header {
+      background: var(--navy);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; text-decoration: none; }
+    .brand span { color: var(--gold-light); }
+    .back-link { font-size: 0.8rem; color: var(--gold-light); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 1; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center; padding: 48px 24px 40px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px);
+    }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 12px; position: relative; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem, 4vw, 2.6rem); color: #fff; line-height: 1.2; margin-bottom: 12px; position: relative; }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p { color: #8da9c4; font-size: 0.95rem; max-width: 520px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    /* KPI Cards */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      position: relative;
+      border: 1.5px solid transparent;
+    }
+    .kpi-card.entradas  { background: var(--green-bg); border-color: var(--green-bd); }
+    .kpi-card.saidas    { background: var(--red-bg);   border-color: var(--red-bd); }
+    .kpi-card.saldo-pos { background: var(--green-bg); border-color: var(--green-bd); }
+    .kpi-card.saldo-neg { background: var(--red-bg);   border-color: var(--red-bd); }
+    .kpi-card.saldo-zero{ background: #f0f4f8; border-color: var(--border); }
+    .kpi-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .kpi-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .kpi-value { font-family: 'DM Serif Display', serif; font-size: 1.6rem; line-height: 1.1; }
+    .kpi-card.entradas  .kpi-value { color: var(--green); }
+    .kpi-card.saidas    .kpi-value { color: var(--red); }
+    .kpi-card.saldo-pos .kpi-value { color: var(--green); }
+    .kpi-card.saldo-neg .kpi-value { color: var(--red); }
+    .kpi-card.saldo-zero .kpi-value { color: var(--muted); }
+    .kpi-sub { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+    /* Alerta saúde */
+    .alerta-saude {
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      display: flex; gap: 14px; align-items: flex-start;
+      border-left: 4px solid transparent;
+    }
+    .alerta-saude.positivo { background: var(--green-bg); border-color: var(--green); }
+    .alerta-saude.negativo { background: var(--red-bg);   border-color: var(--red); }
+    .alerta-saude.neutro   { background: #f0f4f8; border-color: var(--border); }
+    .as-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .as-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .alerta-saude.positivo .as-title { color: var(--green); }
+    .alerta-saude.negativo .as-title { color: var(--red); }
+    .alerta-saude.neutro   .as-title { color: var(--muted); }
+    .as-text { font-size: 0.81rem; color: var(--text); line-height: 1.55; }
+
+    /* Layout principal */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 760px) { .main-grid { grid-template-columns: 1fr; } }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Form */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--navy-mid); margin-bottom: 5px; }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      background: #fff;
+    }
+    .tipo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tipo-btn {
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #f8fafc;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+    .tipo-btn.entrada.active { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .tipo-btn.saida.active   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+    .tipo-btn:hover { border-color: var(--gold); }
+
+    .btn-add {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 3px 10px rgba(201,168,76,0.3);
+      margin-top: 6px;
+    }
+    .btn-add:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(201,168,76,0.4); }
+
+    /* Filtro */
+    .filtro-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .filtro-row select {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text);
+      background: #fff;
+      appearance: none;
+      cursor: pointer;
+    }
+    .filtro-row select:focus { outline: none; border-color: var(--gold); }
+
+    /* Tabela */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+    thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 11px 12px; vertical-align: middle; }
+    .td-data { color: var(--muted); white-space: nowrap; font-size: 0.78rem; }
+    .td-desc { font-weight: 500; max-width: 180px; }
+    .td-valor { font-weight: 700; white-space: nowrap; }
+    .td-valor.entrada { color: var(--green); }
+    .td-valor.saida   { color: var(--red); }
+    .td-tipo span {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .td-tipo .badge-e { background: var(--green-bg); color: var(--green); }
+    .td-tipo .badge-s { background: var(--red-bg);   color: var(--red); }
+    .btn-del {
+      background: none;
+      border: 1px solid var(--red-bd);
+      color: var(--red);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-del:hover { background: var(--red-bg); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .empty-state .es-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* CTA */
+    .cta-footer {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 32px; text-align: center; margin-top: 24px;
+    }
+    .cta-footer h3 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: #fff; margin-bottom: 8px; }
+    .cta-footer p { color: #8da9c4; font-size: 0.86rem; margin-bottom: 20px; max-width: 440px; margin-left: auto; margin-right: auto; }
+    .cta-footer a {
+      display: inline-block; padding: 12px 28px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-weight: 700; font-size: 0.88rem;
+      border-radius: var(--radius); text-decoration: none;
+      transition: transform 0.15s; box-shadow: 0 4px 12px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .kpi-row { grid-template-columns: 1fr; }
+      .filtro-row { grid-template-columns: 1fr; }
+      .card { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+  <a href="index.html" class="back-link">← Voltar ao Painel</a>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">Controle Financeiro</p>
+  <h1>Fluxo de <em>Caixa</em></h1>
+  <p>Registre entradas e saídas, acompanhe o saldo em tempo real e receba alertas automáticos sobre a saúde financeira do período.</p>
+</section>
+
+<div class="container">
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi-card entradas">
+      <div class="kpi-icon">📥</div>
+      <div class="kpi-label">Total de Entradas</div>
+      <div class="kpi-value" id="kpi-entradas">R$ 0,00</div>
+      <div class="kpi-sub" id="kpi-entradas-sub">0 lançamentos</div>
+    </div>
+    <div class="kpi-card saidas">
+      <div class="kpi-icon">📤</div>
+      <div class="kpi-label">Total de Saídas</div>
+      <div class="kpi-value" id="kpi-saidas">R$ 0,00</div>
+      <div class="kpi-sub" id="kpi-saidas-sub">0 lançamentos</div>
+    </div>
+    <div class="kpi-card saldo-zero" id="kpi-saldo-card">
+      <div class="kpi-icon" id="kpi-saldo-icon">💰</div>
+      <div class="kpi-label">Saldo do Período</div>
+      <div class="kpi-value" id="kpi-saldo">R$ 0,00</div>
+      <div class="kpi-sub" id="kpi-saldo-sub">Nenhum lançamento</div>
+    </div>
+  </div>
+
+  <!-- Alerta de saúde -->
+  <div class="alerta-saude neutro" id="alerta-saude">
+    <div class="as-icon">📊</div>
+    <div>
+      <div class="as-title">Aguardando lançamentos</div>
+      <div class="as-text">Registre suas movimentações financeiras para receber o diagnóstico automático do período.</div>
+    </div>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="main-grid">
+
+    <!-- Formulário -->
+    <div>
+      <div class="card">
+        <div class="card-title">Novo Lançamento</div>
+
+        <div class="form-group">
+          <label>Tipo de Movimentação</label>
+          <div class="tipo-row">
+            <button class="tipo-btn entrada active" id="btn-entrada" onclick="setTipo('entrada')">📥 Entrada / Receita</button>
+            <button class="tipo-btn saida" id="btn-saida" onclick="setTipo('saida')">📤 Saída / Despesa</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inp-data">Data</label>
+          <input type="date" id="inp-data">
+        </div>
+
+        <div class="form-group">
+          <label for="inp-desc">Descrição</label>
+          <input type="text" id="inp-desc" placeholder="Ex: Pagamento cliente, Aluguel...">
+        </div>
+
+        <div class="form-group">
+          <label for="inp-valor">Valor (R$)</label>
+          <input type="number" id="inp-valor" placeholder="0,00" min="0.01" step="0.01">
+        </div>
+
+        <button class="btn-add" onclick="adicionarLancamento()">+ Registrar Lançamento</button>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <div>
+      <div class="card">
+        <div class="card-title">Movimentações</div>
+
+        <div class="filtro-row">
+          <select id="filtro-mes" onchange="renderTabela()">
+            <option value="">Todos os meses</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <select id="filtro-ano" onchange="renderTabela()">
+            <option value="">Todos os anos</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body">
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <div class="es-icon">📋</div>
+                    Nenhum lançamento registrado ainda.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-grid -->
+
+  <div class="cta-footer">
+    <h3>Precisa de controle financeiro completo?</h3>
+    <p>Nossa consultoria estrutura um sistema de gestão financeira personalizado para o porte e segmento do seu negócio.</p>
+    <a href="index.html#diagnostico">Falar com um Consultor</a>
+  </div>
+
+</div>
+
+<script>
+  // ── Estado ──
+  let lancamentos = [];
+  let tipoAtivo = 'entrada';
+  let proximoId = 1;
+
+  // ── Inicialização ──
+  (function init() {
+    // Data de hoje no input
+    const hoje = new Date();
+    const yyyy = hoje.getFullYear();
+    const mm   = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dd   = String(hoje.getDate()).padStart(2, '0');
+    document.getElementById('inp-data').value = `${yyyy}-${mm}-${dd}`;
+
+    // Preencher anos no filtro
+    const anoSelect = document.getElementById('filtro-ano');
+    for (let a = yyyy; a >= yyyy - 4; a--) {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      anoSelect.appendChild(opt);
+    }
+
+    // Pré-selecionar mês/ano atual
+    document.getElementById('filtro-mes').value = mm;
+    anoSelect.value = yyyy;
+  })();
+
+  function setTipo(tipo) {
+    tipoAtivo = tipo;
+    document.getElementById('btn-entrada').className = 'tipo-btn entrada' + (tipo === 'entrada' ? ' active' : '');
+    document.getElementById('btn-saida').className   = 'tipo-btn saida'   + (tipo === 'saida'   ? ' active' : '');
+  }
+
+  function fmt(val) {
+    return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function fmtData(iso) {
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  // ── Adicionar lançamento ──
+  function adicionarLancamento() {
+    const data  = document.getElementById('inp-data').value;
+    const desc  = document.getElementById('inp-desc').value.trim();
+    const valor = parseFloat(document.getElementById('inp-valor').value);
+
+    if (!data)       { alert('Informe a data.'); return; }
+    if (!desc)       { alert('Informe a descrição.'); return; }
+    if (!valor || valor <= 0) { alert('Informe um valor válido.'); return; }
+
+    lancamentos.push({ id: proximoId++, data, desc, tipo: tipoAtivo, valor });
+
+    // Ordenar por data decrescente
+    lancamentos.sort((a, b) => b.data.localeCompare(a.data));
+
+    // Limpar campos
+    document.getElementById('inp-desc').value  = '';
+    document.getElementById('inp-valor').value = '';
+
+    atualizarAnos();
+    renderTabela();
+  }
+
+  function atualizarAnos() {
+    const anos = [...new Set(lancamentos.map(l => l.data.split('-')[0]))].sort((a,b) => b-a);
+    const sel  = document.getElementById('filtro-ano');
+    const valAtual = sel.value;
+    // Limpar opções exceto "Todos"
+    while (sel.options.length > 1) sel.remove(1);
+    anos.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a; opt.textContent = a;
+      sel.appendChild(opt);
+    });
+    sel.value = valAtual || (anos[0] || '');
+  }
+
+  // ── Render ──
+  function renderTabela() {
+    const mesFiltro = document.getElementById('filtro-mes').value;
+    const anoFiltro = document.getElementById('filtro-ano').value;
+
+    const filtrados = lancamentos.filter(l => {
+      const [y, m] = l.data.split('-');
+      if (mesFiltro && m !== mesFiltro) return false;
+      if (anoFiltro && y !== anoFiltro) return false;
+      return true;
+    });
+
+    // KPIs do período filtrado
+    const totalE = filtrados.filter(l => l.tipo === 'entrada').reduce((s, l) => s + l.valor, 0);
+    const totalS = filtrados.filter(l => l.tipo === 'saida').reduce((s, l) => s + l.valor, 0);
+    const saldo  = totalE - totalS;
+    const qtdE   = filtrados.filter(l => l.tipo === 'entrada').length;
+    const qtdS   = filtrados.filter(l => l.tipo === 'saida').length;
+
+    document.getElementById('kpi-entradas').textContent = fmt(totalE);
+    document.getElementById('kpi-saidas').textContent   = fmt(totalS);
+    document.getElementById('kpi-saldo').textContent    = fmt(saldo);
+    document.getElementById('kpi-entradas-sub').textContent = qtdE + (qtdE === 1 ? ' lançamento' : ' lançamentos');
+    document.getElementById('kpi-saidas-sub').textContent   = qtdS + (qtdS === 1 ? ' lançamento' : ' lançamentos');
+
+    // Saldo card
+    const saldoCard = document.getElementById('kpi-saldo-card');
+    const saldoIcon = document.getElementById('kpi-saldo-icon');
+    const saldoSub  = document.getElementById('kpi-saldo-sub');
+    if (filtrados.length === 0) {
+      saldoCard.className = 'kpi-card saldo-zero';
+      saldoIcon.textContent = '💰';
+      saldoSub.textContent  = 'Nenhum lançamento';
+    } else if (saldo > 0) {
+      saldoCard.className = 'kpi-card saldo-pos';
+      saldoIcon.textContent = '✅';
+      saldoSub.textContent  = 'Saldo positivo no período';
+    } else if (saldo < 0) {
+      saldoCard.className = 'kpi-card saldo-neg';
+      saldoIcon.textContent = '🚨';
+      saldoSub.textContent  = 'Saldo negativo no período';
+    } else {
+      saldoCard.className = 'kpi-card saldo-zero';
+      saldoIcon.textContent = '⚖️';
+      saldoSub.textContent  = 'Saldo zerado';
+    }
+
+    // Alerta de saúde
+    const alerta = document.getElementById('alerta-saude');
+    if (filtrados.length === 0) {
+      alerta.className = 'alerta-saude neutro';
+      alerta.innerHTML = `<div class="as-icon">📊</div><div><div class="as-title">Nenhum lançamento no período</div><div class="as-text">Registre movimentações ou ajuste o filtro de mês/ano para visualizar o diagnóstico.</div></div>`;
+    } else if (saldo < 0) {
+      const pctNeg = totalE > 0 ? (Math.abs(saldo) / totalE * 100).toFixed(1) : '100';
+      alerta.className = 'alerta-saude negativo';
+      alerta.innerHTML = `
+        <div class="as-icon">🚨</div>
+        <div>
+          <div class="as-title">Atenção: Saldo Negativo de ${pctNeg}% no Período</div>
+          <div class="as-text">
+            Suas saídas superam as entradas em <strong>${fmt(Math.abs(saldo))}</strong>. 
+            Isso impacta diretamente o capital de giro e pode comprometer pagamentos futuros.
+            <br><br>
+            <strong>Ações imediatas:</strong> (1) Antecipe o recebimento de clientes em aberto — ofereça 3–5% de desconto para pagamento à vista.
+            (2) Identifique e suspenda gastos não-essenciais do próximo período.
+            (3) Negocie prazo maior com fornecedores para aliviar o caixa.
+          </div>
+        </div>`;
+    } else if (saldo === 0 && filtrados.length > 0) {
+      alerta.className = 'alerta-saude neutro';
+      alerta.innerHTML = `<div class="as-icon">⚖️</div><div><div class="as-title">Equilíbrio Exato</div><div class="as-text">Entradas e saídas estão niveladas. Não há prejuízo, mas também não há geração de caixa. Busque aumentar entradas ou reduzir saídas para criar margem de segurança.</div></div>`;
+    } else {
+      const pctSaude = (saldo / totalE * 100).toFixed(1);
+      alerta.className = 'alerta-saude positivo';
+      alerta.innerHTML = `<div class="as-icon">✅</div><div><div class="as-title">Caixa Positivo — Saldo representa ${pctSaude}% das entradas</div><div class="as-text">Seu fluxo de caixa está saudável no período. Continue monitorando mensalmente e mantenha uma reserva mínima equivalente a 2–3 meses de custos fixos.</div></div>`;
+    }
+
+    // Tabela
+    const tbody = document.getElementById('tabela-body');
+    if (filtrados.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="es-icon">📋</div>Nenhum lançamento para o período selecionado.</div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtrados.map(l => `
+      <tr>
+        <td class="td-data">${fmtData(l.data)}</td>
+        <td class="td-desc">${escHtml(l.desc)}</td>
+        <td class="td-tipo">
+          <span class="${l.tipo === 'entrada' ? 'badge-e' : 'badge-s'}">
+            ${l.tipo === 'entrada' ? 'Entrada' : 'Saída'}
+          </span>
+        </td>
+        <td class="td-valor ${l.tipo}">
+          ${l.tipo === 'entrada' ? '+' : '-'} ${fmt(l.valor)}
+        </td>
+        <td><button class="btn-del" onclick="excluir(${l.id})">Excluir</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function excluir(id) {
+    lancamentos = lancamentos.filter(l => l.id !== id);
+    renderTabela();
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>
