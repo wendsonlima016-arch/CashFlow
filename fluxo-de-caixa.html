@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Saúde Financeira | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --navy-light: #1a5276;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --gold-pale:  #fdf6e3;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--navy);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .site-header .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.03em;
+    }
+    .site-header .brand span { color: var(--gold-light); }
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--gold-light);
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center;
+      padding: 56px 24px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 60px,
+        rgba(201,168,76,0.04) 60px,
+        rgba(201,168,76,0.04) 61px
+      );
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--gold-light);
+    }
+    .hero p {
+      color: #8da9c4;
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Inputs ── */
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .input-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--navy-mid);
+    }
+    .input-group .hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: -4px;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-wrapper span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%;
+      padding: 11px 12px 11px 34px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      background: #fff;
+    }
+
+    /* ── Button ── */
+    .btn-calcular {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: var(--navy);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.45);
+    }
+    .btn-calcular:active { transform: translateY(0); }
+
+    /* ── Results section ── */
+    #resultados { display: none; }
+    #resultados.visible { display: block; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .result-card {
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid transparent;
+    }
+    .result-card.neutral {
+      background: #f0f4f8;
+      border-color: var(--border);
+    }
+    .result-card.green {
+      background: var(--green-bg);
+      border-color: #a3e4c1;
+    }
+    .result-card.red {
+      background: var(--red-bg);
+      border-color: #f1a9a0;
+    }
+    .result-card.amber {
+      background: var(--amber-bg);
+      border-color: #f5d08a;
+    }
+    .result-card .rc-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .result-card .rc-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.65rem;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .result-card.green .rc-value { color: var(--green); }
+    .result-card.red .rc-value { color: var(--red); }
+    .result-card.amber .rc-value { color: var(--amber); }
+    .result-card .rc-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .result-card .rc-icon {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 1.4rem;
+      opacity: 0.5;
+    }
+
+    /* ── Diagnostico ── */
+    .diag-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+    }
+    .diag-header.green { background: var(--green-bg); border: 1.5px solid #a3e4c1; }
+    .diag-header.red   { background: var(--red-bg);   border: 1.5px solid #f1a9a0; }
+    .diag-header.amber { background: var(--amber-bg); border: 1.5px solid #f5d08a; }
+    .diag-icon { font-size: 2rem; flex-shrink: 0; }
+    .diag-header h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 2px; }
+    .diag-header.green h3 { color: var(--green); }
+    .diag-header.red   h3 { color: var(--red); }
+    .diag-header.amber h3 { color: var(--amber); }
+    .diag-header p { font-size: 0.86rem; color: var(--muted); line-height: 1.5; }
+
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .alert-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      border-left: 4px solid transparent;
+    }
+    .alert-item.red   { background: var(--red-bg);   border-color: var(--red); }
+    .alert-item.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .alert-item.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-item .ai-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-item .ai-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .alert-item.red   .ai-title { color: var(--red); }
+    .alert-item.amber .ai-title { color: var(--amber); }
+    .alert-item.green .ai-title { color: var(--green); }
+    .alert-item .ai-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ── Plano de ação ── */
+    .plano-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--navy-mid);
+      margin-bottom: 14px;
+    }
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .step-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 0.84rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .step-text strong { color: var(--navy-mid); }
+
+    /* ── Gauge bar ── */
+    .gauge-section {
+      margin-top: 24px;
+    }
+    .gauge-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .gauge-label span:last-child { font-weight: 700; color: var(--text); }
+    .gauge-track {
+      height: 10px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .gauge-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .gauge-fill.green { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .gauge-fill.amber { background: linear-gradient(90deg, #e67e22, #f39c12); }
+    .gauge-fill.red   { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+
+    /* ── Footer ── */
+    .cta-footer {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      text-align: center;
+      margin-top: 24px;
+    }
+    .cta-footer h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .cta-footer p {
+      color: #8da9c4;
+      font-size: 0.88rem;
+      margin-bottom: 22px;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-footer a {
+      display: inline-block;
+      padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.4);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .card { padding: 22px 18px; }
+      .hero  { padding: 40px 20px 36px; }
+      .cta-footer { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+    <a href="index.html" class="back-link">← Voltar ao Painel</a>
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Ferramenta Gratuita</p>
+    <h1>Simulador de <em>Saúde Financeira</em></h1>
+    <p>Insira os números do seu negócio e receba um diagnóstico completo com alertas e plano de ação personalizado.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- INPUTS -->
+    <div class="card">
+      <div class="card-title">Dados do seu negócio</div>
+      <div class="input-grid">
+
+        <div class="input-group">
+          <label for="faturamento">Faturamento Bruto Mensal</label>
+          <p class="hint">Receita total antes de qualquer desconto</p>
+          <div class="input-wrapper">
+            <span>R$</span>
+            <input type="number" id="faturamento" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="custos-fixos">Custos Fixos Mensais</label>
+          <p class="hint">Aluguel, salários, assinaturas, etc.</p>
+          <div class="input-wrapper">
+            <span>R$</span>
+            <input type="number" id="custos-fixos" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="custos-variaveis">Custos Variáveis Mensais</label>
+          <p class="hint">Impostos, matéria-prima, comissões, etc.</p>
+          <div class="input-wrapper">
+            <span>R$</span>
+            <input type="number" id="custos-variaveis" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="prolabore">Pró-labore dos Sócios</label>
+          <p class="hint">Remuneração mensal dos proprietários</p>
+          <div class="input-wrapper">
+            <span>R$</span>
+            <input type="number" id="prolabore" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+
+      </div>
+      <button class="btn-calcular" onclick="calcular()">Calcular Diagnóstico Financeiro</button>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="resultados">
+
+      <!-- KPIs -->
+      <div class="card">
+        <div class="card-title">Resultado do Diagnóstico</div>
+        <div class="results-grid" id="kpi-grid">
+          <!-- preenchido via JS -->
+        </div>
+
+        <!-- Gauge: margem de lucro -->
+        <div class="gauge-section">
+          <div class="gauge-label">
+            <span>Margem de Lucro Líquido</span>
+            <span id="gauge-label-val">0%</span>
+          </div>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="gauge-fill" style="width: 0%"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:4px;">
+            <span style="font-size:0.68rem; color:var(--muted)">Prejuízo</span>
+            <span style="font-size:0.68rem; color:var(--muted)">Crítico (10%)</span>
+            <span style="font-size:0.68rem; color:var(--muted)">Saudável (20%)</span>
+            <span style="font-size:0.68rem; color:var(--muted)">Excelente</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIAGNÓSTICO -->
+      <div class="card">
+        <div class="card-title">Diagnóstico e Plano de Ação</div>
+        <div id="diag-header-container"></div>
+        <div class="alerts-list" id="alerts-list"></div>
+        <div class="plano-title">Passos recomendados</div>
+        <div class="steps-list" id="steps-list"></div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-footer">
+      <h3>Precisa de uma análise mais profunda?</h3>
+      <p>Nossos consultores podem estruturar um plano financeiro completo para o seu negócio — com metas, projeções e acompanhamento.</p>
+      <a href="index.html#diagnostico">Solicitar Diagnóstico Gratuito</a>
+    </div>
+
+  </div>
+
+  <script>
+    function fmt(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+    function pct(val) {
+      return (val >= 0 ? '+' : '') + val.toFixed(1) + '%';
+    }
+    function clamp(val, min, max) {
+      return Math.min(Math.max(val, min), max);
+    }
+
+    function calcular() {
+      const fat  = parseFloat(document.getElementById('faturamento').value)     || 0;
+      const cf   = parseFloat(document.getElementById('custos-fixos').value)    || 0;
+      const cv   = parseFloat(document.getElementById('custos-variaveis').value)|| 0;
+      const pl   = parseFloat(document.getElementById('prolabore').value)       || 0;
+
+      if (fat <= 0) {
+        alert('Informe o faturamento mensal para calcular o diagnóstico.');
+        return;
+      }
+
+      // ── Cálculos ──
+      const margContrib      = fat - cv;                      // Margem de Contribuição R$
+      const margContribPct   = (margContrib / fat) * 100;    // MC %
+      const totalCustos      = cf + cv + pl;                  // Total gasto
+      const lucroLiq         = fat - totalCustos;             // Lucro / Prejuízo
+      const margemLiq        = (lucroLiq / fat) * 100;        // Margem líquida %
+      const pctCfSobFat      = (cf / fat) * 100;             // Custo fixo / faturamento
+      const pctCvSobFat      = (cv / fat) * 100;             // Custo variável / faturamento
+      // Ponto de equilíbrio: CF + PL / MC%
+      const pontoEquil       = margContribPct > 0
+                                 ? ((cf + pl) / (margContribPct / 100))
+                                 : null;
+
+      // ── KPI Cards ──
+      const kpiGrid = document.getElementById('kpi-grid');
+      kpiGrid.innerHTML = '';
+
+      const cards = [
+        {
+          label: 'Faturamento Bruto',
+          value: fmt(fat),
+          sub: '100% da receita',
+          color: 'neutral',
+          icon: '📊'
+        },
+        {
+          label: 'Margem de Contribuição',
+          value: fmt(margContrib),
+          sub: margContribPct.toFixed(1) + '% do faturamento',
+          color: margContrib >= 0 ? 'green' : 'red',
+          icon: '📈'
+        },
+        {
+          label: 'Lucro Líquido',
+          value: fmt(lucroLiq),
+          sub: margemLiq.toFixed(1) + '% do faturamento',
+          color: lucroLiq > 0 ? 'green' : 'red',
+          icon: lucroLiq > 0 ? '✅' : '🚨'
+        },
+        {
+          label: 'Ponto de Equilíbrio',
+          value: pontoEquil !== null ? fmt(pontoEquil) : '—',
+          sub: pontoEquil !== null
+            ? (fat >= pontoEquil
+                ? 'Você está acima do break-even ✓'
+                : `Faltam ${fmt(pontoEquil - fat)} para equilibrar`)
+            : 'MC negativa, impossível calcular',
+          color: pontoEquil !== null && fat >= pontoEquil ? 'green' : 'amber',
+          icon: '⚖️'
+        }
+      ];
+
+      cards.forEach(c => {
+        kpiGrid.innerHTML += `
+          <div class="result-card ${c.color}">
+            <span class="rc-icon">${c.icon}</span>
+            <div class="rc-label">${c.label}</div>
+            <div class="rc-value">${c.value}</div>
+            <div class="rc-sub">${c.sub}</div>
+          </div>`;
+      });
+
+      // ── Gauge ──
+      const gaugePct = clamp(margemLiq, 0, 40);
+      const gaugeNorm = (gaugePct / 40) * 100;
+      const gaugeFill = document.getElementById('gauge-fill');
+      const gaugeClass = margemLiq < 0 ? 'red' : margemLiq < 10 ? 'red' : margemLiq < 20 ? 'amber' : 'green';
+      gaugeFill.className = `gauge-fill ${gaugeClass}`;
+      setTimeout(() => { gaugeFill.style.width = gaugeNorm + '%'; }, 100);
+      document.getElementById('gauge-label-val').textContent = margemLiq.toFixed(1) + '%';
+
+      // ── Diagnóstico ──
+      const diagHeader   = document.getElementById('diag-header-container');
+      const alertsList   = document.getElementById('alerts-list');
+      const stepsList    = document.getElementById('steps-list');
+      alertsList.innerHTML = '';
+      stepsList.innerHTML  = '';
+
+      let diagClass, diagIcon, diagTitulo, diagTexto;
+      const alerts = [];
+      const steps  = [];
+
+      // Status geral
+      if (lucroLiq < 0) {
+        diagClass  = 'red';
+        diagIcon   = '🚨';
+        diagTitulo = 'Situação Crítica — Prejuízo Identificado';
+        diagTexto  = `Sua empresa está gastando ${fmt(Math.abs(lucroLiq))} a mais do que arrecada. Ação imediata é necessária.`;
+      } else if (margemLiq < 10) {
+        diagClass  = 'amber';
+        diagIcon   = '⚠️';
+        diagTitulo = 'Margem Crítica — Risco Elevado';
+        diagTexto  = `Você está no positivo, mas com margem de apenas ${margemLiq.toFixed(1)}%. Qualquer oscilação de receita pode gerar prejuízo.`;
+      } else if (margemLiq < 20) {
+        diagClass  = 'amber';
+        diagIcon   = '📊';
+        diagTitulo = 'Operação Estável — Há Espaço para Crescer';
+        diagTexto  = `Margem de ${margemLiq.toFixed(1)}% é funcional, mas abaixo do ideal para reinvestimento e segurança financeira.`;
+      } else {
+        diagClass  = 'green';
+        diagIcon   = '🏆';
+        diagTitulo = 'Saúde Financeira Excelente!';
+        diagTexto  = `Margem de ${margemLiq.toFixed(1)}% indica uma operação lucrativa e com base sólida para crescer.`;
+      }
+
+      diagHeader.innerHTML = `
+        <div class="diag-header ${diagClass}">
+          <div class="diag-icon">${diagIcon}</div>
+          <div>
+            <h3>${diagTitulo}</h3>
+            <p>${diagTexto}</p>
+          </div>
+        </div>`;
+
+      // ── Alertas condicionais ──
+
+      // 1. Prejuízo
+      if (lucroLiq < 0) {
+        const faltaPct = pontoEquil ? (((pontoEquil - fat) / fat) * 100).toFixed(1) : null;
+        alerts.push({
+          color: 'red',
+          icon: '🚨',
+          title: 'Prejuízo Operacional',
+          text: `Deficit de ${fmt(Math.abs(lucroLiq))} por mês.`
+            + (faltaPct ? ` Você precisa aumentar o faturamento em <strong>${faltaPct}%</strong> ou cortar custos no mesmo valor para atingir o equilíbrio.` : '')
+        });
+        steps.push(`<strong>Emergência:</strong> Mapeie todos os custos e elimine os 3 maiores gastos não-essenciais imediatamente — foque em contratos, assinaturas e despesas administrativas.`);
+        steps.push(`<strong>Faturamento:</strong> Crie uma oferta de entrada (produto ou serviço menor) para gerar caixa rápido nos próximos 30 dias.`);
+        steps.push(`<strong>Negociação:</strong> Renegocie prazos com fornecedores e priorize o recebimento antecipado de clientes — ofereça 3–5% de desconto para pagamento à vista.`);
+      }
+
+      // 2. Margem de lucro < 10%
+      if (margemLiq >= 0 && margemLiq < 10) {
+        const aumento = (10 - margemLiq).toFixed(1);
+        alerts.push({
+          color: 'red',
+          icon: '📉',
+          title: 'Alerta: Margem de Lucro Crítica',
+          text: `Margem de <strong>${margemLiq.toFixed(1)}%</strong> — abaixo de 10% há altíssimo risco operacional. Meta imediata: atingir pelo menos 10%. Para isso, reduza custos variáveis em <strong>${(aumento / 2).toFixed(1)}%</strong> e reajuste preços em <strong>${(aumento / 2).toFixed(1)}%</strong>.`
+        });
+        if (steps.length === 0) {
+          steps.push(`<strong>Revisão de preços:</strong> Calcule o preço mínimo viável para cada produto/serviço com pelo menos 15% de margem. Reajuste os itens mais vendidos primeiro.`);
+          steps.push(`<strong>Corte de custos variáveis:</strong> Analise fornecedores, renegocie contratos e busque alternativas para reduzir o custo variável em pelo menos <strong>${(aumento).toFixed(1)}%</strong>.`);
+          steps.push(`<strong>Mix de vendas:</strong> Identifique os produtos/serviços com maior margem e concentre esforços de vendas neles.`);
+        }
+      }
+
+      // 3. Custo fixo > 30% do faturamento
+      if (pctCfSobFat > 30) {
+        alerts.push({
+          color: 'amber',
+          icon: '🏗️',
+          title: `Estrutura Pesada — Custo Fixo em ${pctCfSobFat.toFixed(1)}% do Faturamento`,
+          text: `Custos fixos acima de 30% comprometem a flexibilidade do negócio. Recomendado: reduzir contratos fixos em <strong>10%</strong> para liberar ${fmt(cf * 0.10)} por mês.`
+        });
+        if (steps.length < 3) {
+          steps.push(`<strong>Auditoria de custos fixos:</strong> Liste cada custo fixo e questione se ele pode ser variabilizado, terceirizado ou eliminado — mira de corte: 10% do total fixo.`);
+        }
+      }
+
+      // 4. Custo variável > 50% do faturamento
+      if (pctCvSobFat > 50) {
+        alerts.push({
+          color: 'amber',
+          icon: '⚙️',
+          title: `Custos Variáveis Elevados — ${pctCvSobFat.toFixed(1)}% do Faturamento`,
+          text: `Mais da metade da receita vai para custos variáveis, deixando pouca margem de contribuição. Revise a precificação e a cadeia de fornecimento.`
+        });
+      }
+
+      // 5. Pró-labore > 20% do faturamento
+      if ((pl / fat) * 100 > 20) {
+        alerts.push({
+          color: 'amber',
+          icon: '👤',
+          title: `Pró-labore Alto — ${((pl / fat) * 100).toFixed(1)}% do Faturamento`,
+          text: `O pró-labore está comprometendo a rentabilidade. O ideal é manter abaixo de 15–20% enquanto o negócio escala. Considere um plano gradual de ajuste.`
+        });
+      }
+
+      // 6. Lucro > 20% — parabéns
+      if (margemLiq >= 20) {
+        alerts.push({
+          color: 'green',
+          icon: '🚀',
+          title: 'Negócio Saudável — Hora de Escalar',
+          text: `Margem de <strong>${margemLiq.toFixed(1)}%</strong> está acima do benchmark. Você tem base para reinvestir com segurança.`
+        });
+        steps.push(`<strong>Reserva estratégica:</strong> Destine pelo menos <strong>3 meses</strong> de custos fixos (${fmt(cf * 3)}) como reserva de emergência antes de qualquer expansão.`);
+        steps.push(`<strong>Marketing e aquisição:</strong> Aloque <strong>5–8% do faturamento</strong> (${fmt(fat * 0.06)}/mês) em canais de aquisição escaláveis — tráfego pago, conteúdo ou parcerias estratégicas.`);
+        steps.push(`<strong>Reinvestimento operacional:</strong> Com margem saudável, avalie automatizar processos ou contratar para aumentar a capacidade produtiva sem elevar os custos variáveis proporcionalmente.`);
+      }
+
+      // Renderizar alertas
+      if (alerts.length === 0) {
+        alerts.push({
+          color: 'green',
+          icon: '✅',
+          title: 'Nenhum alerta crítico',
+          text: 'Seus indicadores estão dentro de parâmetros saudáveis. Continue monitorando mensalmente.'
+        });
+      }
+
+      alerts.forEach(a => {
+        alertsList.innerHTML += `
+          <div class="alert-item ${a.color}">
+            <div class="ai-icon">${a.icon}</div>
+            <div>
+              <div class="ai-title">${a.title}</div>
+              <div class="ai-text">${a.text}</div>
+            </div>
+          </div>`;
+      });
+
+      if (steps.length === 0) {
+        steps.push(`<strong>Monitoramento mensal:</strong> Registre esses números todo mês e acompanhe a evolução das margens.`);
+        steps.push(`<strong>Metas de crescimento:</strong> Com base no faturamento atual de ${fmt(fat)}, defina metas de crescimento de 5–10% ao mês.`);
+        steps.push(`<strong>Consulte um especialista:</strong> Mesmo com boa saúde financeira, uma consultoria estratégica pode identificar oportunidades de otimização invisíveis nos números.`);
+      }
+
+      steps.forEach((s, i) => {
+        stepsList.innerHTML += `
+          <div class="step-item">
+            <div class="step-num">${i + 1}</div>
+            <div class="step-text">${s}</div>
+          </div>`;
+      });
+
+      // Mostrar resultados
+      const res = document.getElementById('resultados');
+      res.classList.add('visible');
+      setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    }
+  </script>
+
+</body>
+</html>
