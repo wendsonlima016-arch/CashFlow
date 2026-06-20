@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ponto de Equilíbrio | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .site-header {
+      background: var(--navy);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .site-header .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .site-header .brand span { color: var(--gold-light); }
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--gold-light);
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center;
+      padding: 56px 24px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 60px,
+        rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px
+      );
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p {
+      color: #8da9c4;
+      font-size: 1rem;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* Conceito box */
+    .conceito {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .conceito-icon {
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .conceito h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+    .conceito p {
+      font-size: 0.86rem;
+      color: #8da9c4;
+      line-height: 1.65;
+    }
+    .conceito strong { color: #fff; }
+
+    /* Formula */
+    .formula-box {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 560px) { .input-grid { grid-template-columns: 1fr; } }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .input-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--navy-mid);
+    }
+    .input-group .hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: -3px;
+      line-height: 1.4;
+    }
+    .input-wrapper { position: relative; }
+    .input-wrapper .prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%;
+      padding: 12px 12px 12px 34px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      background: #fff;
+    }
+
+    .btn-calcular {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: var(--navy);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+    .btn-calcular:active { transform: translateY(0); }
+
+    /* Resultado */
+    #resultado { display: none; }
+    #resultado.visible { display: block; }
+
+    .resultado-destaque {
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      text-align: center;
+      margin-bottom: 24px;
+      border: 2px solid transparent;
+    }
+    .resultado-destaque.positivo {
+      background: var(--green-bg);
+      border-color: #a3e4c1;
+    }
+    .resultado-destaque.negativo {
+      background: var(--red-bg);
+      border-color: #f1a9a0;
+    }
+    .resultado-destaque .rd-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .resultado-destaque .rd-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .resultado-destaque.positivo .rd-value { color: var(--green); }
+    .resultado-destaque.negativo .rd-value { color: var(--red); }
+    .resultado-destaque .rd-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.55;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 560px) { .kpi-row { grid-template-columns: 1fr; } }
+
+    .kpi-mini {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 1px 8px rgba(11,37,69,0.05);
+    }
+    .kpi-mini .km-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .kpi-mini .km-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.35rem;
+      color: var(--navy-mid);
+    }
+    .kpi-mini .km-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Barra de segurança */
+    .seguranca-section {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 16px rgba(11,37,69,0.06);
+    }
+    .seg-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .seg-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .seg-row span:last-child { font-weight: 700; color: var(--text); }
+    .gauge-track {
+      height: 12px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .gauge-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .gauge-fill.green { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .gauge-fill.amber { background: linear-gradient(90deg, #e67e22, #f39c12); }
+    .gauge-fill.red   { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+
+    /* Interpretação */
+    .interp-card {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      border-left: 4px solid transparent;
+      margin-bottom: 12px;
+    }
+    .interp-card.green { background: var(--green-bg); border-color: var(--green); }
+    .interp-card.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .interp-card.red   { background: var(--red-bg);   border-color: var(--red); }
+    .interp-card .ic-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .interp-card .ic-title { font-size: 0.84rem; font-weight: 700; margin-bottom: 4px; }
+    .interp-card.green .ic-title { color: var(--green); }
+    .interp-card.amber .ic-title { color: var(--amber); }
+    .interp-card.red   .ic-title { color: var(--red); }
+    .interp-card .ic-text { font-size: 0.81rem; color: var(--text); line-height: 1.55; }
+
+    .cta-footer {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      text-align: center;
+      margin-top: 24px;
+    }
+    .cta-footer h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .cta-footer p {
+      color: #8da9c4;
+      font-size: 0.88rem;
+      margin-bottom: 22px;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-footer a {
+      display: inline-block;
+      padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .card { padding: 22px 18px; }
+      .conceito { flex-direction: column; gap: 12px; }
+      .resultado-destaque { padding: 24px 18px; }
+      .seguranca-section { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+    <a href="index.html" class="back-link">← Voltar ao Painel</a>
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Calculadora Estratégica</p>
+    <h1>Ponto de <em>Equilíbrio</em></h1>
+    <p>Descubra o faturamento mínimo que sua empresa precisa gerar para cobrir todos os custos — sem lucro, sem prejuízo.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- O que é -->
+    <div class="conceito">
+      <div class="conceito-icon">⚖️</div>
+      <div>
+        <h2>O que é o Ponto de Equilíbrio?</h2>
+        <p>
+          É o <strong>faturamento mínimo necessário</strong> para que sua empresa cubra todos os seus custos fixos e variáveis sem gerar lucro nem prejuízo. 
+          Abaixo desse valor, cada real vendido representa uma perda. Acima dele, você começa a gerar riqueza de verdade.
+          <br><br>
+          Todo gestor precisa saber esse número de cor — ele é o <strong>piso da sua operação</strong>.
+        </p>
+        <div class="formula-box">
+          Ponto de Equilíbrio = Custos Fixos Totais ÷ Margem de Contribuição (%)
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculadora -->
+    <div class="card">
+      <div class="card-title">Calculadora de Break-Even</div>
+      <div class="input-grid">
+
+        <div class="input-group">
+          <label for="custos-fixos">Custos Fixos Totais</label>
+          <p class="hint">Some aluguel, salários, pró-labore, assinaturas e todas as despesas que não mudam com o volume de vendas.</p>
+          <div class="input-wrapper">
+            <span class="prefix">R$</span>
+            <input type="number" id="custos-fixos" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="margem-contrib">Margem de Contribuição Média</label>
+          <p class="hint">Percentual que sobra da receita após deduzir os custos variáveis. Exemplo: se vende R$100 e gasta R$40 em variáveis, a MC é 60%.</p>
+          <div class="input-wrapper">
+            <span class="prefix">%</span>
+            <input type="number" id="margem-contrib" placeholder="0,0" min="0.1" max="100" step="0.5">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Campo opcional: faturamento atual -->
+      <div style="margin-top: 20px;">
+        <div class="input-group">
+          <label for="fat-atual">Faturamento Atual (opcional)</label>
+          <p class="hint">Informe quanto sua empresa fatura hoje para comparar com o ponto de equilíbrio calculado.</p>
+          <div class="input-wrapper">
+            <span class="prefix">R$</span>
+            <input type="number" id="fat-atual" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-calcular" onclick="calcular()">Calcular Ponto de Equilíbrio</button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultado">
+
+      <div class="resultado-destaque" id="res-destaque">
+        <div class="rd-label">Faturamento Mínimo Necessário</div>
+        <div class="rd-value" id="res-valor">—</div>
+        <div class="rd-sub" id="res-sub">—</div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-mini">
+          <div class="km-label">Custos Fixos</div>
+          <div class="km-value" id="kpi-cf">—</div>
+          <div class="km-sub">Base do cálculo</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="km-label">Margem de Contribuição</div>
+          <div class="km-value" id="kpi-mc">—</div>
+          <div class="km-sub">% que cobre os fixos</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="km-label">Cada R$1.000 vendido gera</div>
+          <div class="km-value" id="kpi-contrib-real">—</div>
+          <div class="km-sub">de contribuição líquida</div>
+        </div>
+      </div>
+
+      <!-- Barra de segurança (só aparece se tiver faturamento atual) -->
+      <div class="seguranca-section" id="seg-section" style="display:none">
+        <div class="seg-title">Margem de Segurança Operacional</div>
+        <div class="seg-row">
+          <span>Distância do ponto de equilíbrio</span>
+          <span id="seg-valor">—</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill" id="seg-gauge" style="width:0%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span style="font-size:0.68rem;color:var(--muted)">No limite</span>
+          <span style="font-size:0.68rem;color:var(--muted)">Seguro (20%)</span>
+          <span style="font-size:0.68rem;color:var(--muted)">Confortável (40%)</span>
+          <span style="font-size:0.68rem;color:var(--muted)">Sólido</span>
+        </div>
+      </div>
+
+      <!-- Interpretação -->
+      <div class="card">
+        <div class="card-title">Interpretação e Orientações</div>
+        <div id="interpretacoes"></div>
+      </div>
+
+    </div>
+
+    <div class="cta-footer">
+      <h3>Quer saber se seus preços estão certos?</h3>
+      <p>Nossa consultoria faz o mapeamento completo da sua margem de contribuição por produto ou serviço — com plano de precificação estratégica.</p>
+      <a href="index.html#diagnostico">Falar com um Consultor</a>
+    </div>
+
+  </div>
+
+  <script>
+    function fmt(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcular() {
+      const cf  = parseFloat(document.getElementById('custos-fixos').value)    || 0;
+      const mc  = parseFloat(document.getElementById('margem-contrib').value)  || 0;
+      const fat = parseFloat(document.getElementById('fat-atual').value)       || 0;
+
+      if (cf <= 0) { alert('Informe os custos fixos totais.'); return; }
+      if (mc <= 0 || mc >= 100) { alert('Informe a margem de contribuição entre 0,1% e 99,9%.'); return; }
+
+      const pe = cf / (mc / 100);
+      const contribPor1000 = 1000 * (mc / 100);
+
+      // Destaque
+      const destaque = document.getElementById('res-destaque');
+      document.getElementById('res-valor').textContent = fmt(pe);
+
+      if (fat > 0) {
+        const diff = fat - pe;
+        if (diff >= 0) {
+          destaque.className = 'resultado-destaque positivo';
+          document.getElementById('res-sub').textContent =
+            `Seu faturamento atual de ${fmt(fat)} está ${fmt(diff)} acima do ponto de equilíbrio. Você está operando com lucro.`;
+        } else {
+          destaque.className = 'resultado-destaque negativo';
+          document.getElementById('res-sub').textContent =
+            `Seu faturamento atual de ${fmt(fat)} está ${fmt(Math.abs(diff))} abaixo do necessário. Você está operando com prejuízo.`;
+        }
+      } else {
+        destaque.className = 'resultado-destaque positivo';
+        document.getElementById('res-sub').textContent =
+          `Para cobrir ${fmt(cf)} em custos fixos com margem de ${mc}%, sua empresa precisa faturar pelo menos esse valor por mês.`;
+      }
+
+      // KPIs
+      document.getElementById('kpi-cf').textContent = fmt(cf);
+      document.getElementById('kpi-mc').textContent = mc.toFixed(1) + '%';
+      document.getElementById('kpi-contrib-real').textContent = fmt(contribPor1000);
+
+      // Margem de segurança
+      const segSection = document.getElementById('seg-section');
+      if (fat > 0) {
+        segSection.style.display = 'block';
+        const margSeg = ((fat - pe) / fat) * 100;
+        document.getElementById('seg-valor').textContent = margSeg.toFixed(1) + '%';
+        const gaugeEl = document.getElementById('seg-gauge');
+        const clampedPct = Math.min(Math.max(margSeg, 0), 60);
+        const gaugeClass = margSeg < 0 ? 'red' : margSeg < 20 ? 'amber' : 'green';
+        gaugeEl.className = `gauge-fill ${gaugeClass}`;
+        setTimeout(() => { gaugeEl.style.width = (clampedPct / 60 * 100) + '%'; }, 100);
+      } else {
+        segSection.style.display = 'none';
+      }
+
+      // Interpretações
+      const interp = document.getElementById('interpretacoes');
+      interp.innerHTML = '';
+      const cards = [];
+
+      if (fat > 0 && fat < pe) {
+        cards.push({ color: 'red', icon: '🚨', title: 'Operação com Prejuízo',
+          text: `Você precisa aumentar o faturamento em ${fmt(pe - fat)} ou reduzir os custos fixos para atingir o equilíbrio. Cada mês abaixo do break-even consome reservas de caixa.` });
+      }
+
+      if (mc < 30) {
+        cards.push({ color: 'amber', icon: '⚙️', title: 'Margem de Contribuição Baixa',
+          text: `Com apenas ${mc.toFixed(1)}% de MC, você precisa de um volume muito alto de vendas para cobrir seus custos fixos. Revise sua precificação ou reduza custos variáveis — cada ponto percentual de MC a mais reduz o ponto de equilíbrio significativamente.` });
+      }
+
+      if (fat > 0 && fat >= pe && ((fat - pe) / fat) * 100 < 20) {
+        cards.push({ color: 'amber', icon: '⚠️', title: 'Margem de Segurança Estreita',
+          text: `Você está acima do break-even, mas com menos de 20% de margem de segurança. Uma queda de faturamento de ${(((fat - pe) / fat) * 100).toFixed(1)}% já colocaria a empresa no prejuízo. Trabalhe para aumentar essa distância.` });
+      }
+
+      if (fat > 0 && ((fat - pe) / fat) * 100 >= 20) {
+        cards.push({ color: 'green', icon: '✅', title: 'Posição Confortável',
+          text: `Sua empresa tem margem de segurança saudável. Foque agora em manter a eficiência dos custos fixos e aumentar a margem de contribuição para escalar com mais rentabilidade.` });
+      }
+
+      cards.push({ color: 'green', icon: '💡', title: 'Como reduzir o Ponto de Equilíbrio',
+        text: `Existem dois caminhos: (1) reduzir custos fixos — cada R$1.000 cortado dos fixos reduz o break-even em ${fmt(1000 / (mc / 100))}; ou (2) aumentar a MC — cada 1% a mais na margem reduz o faturamento mínimo exigido.` });
+
+      cards.forEach(c => {
+        interp.innerHTML += `
+          <div class="interp-card ${c.color}">
+            <div class="ic-icon">${c.icon}</div>
+            <div>
+              <div class="ic-title">${c.title}</div>
+              <div class="ic-text">${c.text}</div>
+            </div>
+          </div>`;
+      });
+
+      const res = document.getElementById('resultado');
+      res.classList.add('visible');
+      setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    }
+  </script>
+
+</body>
+</html>
