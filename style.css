@@ -57,3 +57,41 @@ footer {
   font-size: 0.9rem;
   margin-top: 50px;
 }
+
+.menu-abas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.aba-card {
+  display: block;
+  background: #ffffff;
+  border: 1.5px solid #dce6ef;
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-decoration: none;
+  color: #1c2b3a;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(11,37,69,0.06);
+}
+
+.aba-card:hover {
+  border-color: #c9a84c;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.2);
+  transform: translateY(-2px);
+}
+
+.aba-card h3 {
+  color: #134074;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.aba-card p {
+  font-size: 0.84rem;
+  color: #6b7f94;
+  line-height: 1.5;
+  margin: 0;
+}
