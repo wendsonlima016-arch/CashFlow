@@ -1,52 +1,724 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cash-Flow | Consultoria Financeira</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- SEO -->
+  <title>Cash-Flow | Consultoria Financeira Estratégica</title>
+  <meta name="description" content="Consultoria financeira especializada em gestão de fluxo de caixa, precificação, redução de custos e otimização de lucros. Ferramentas gratuitas e diagnóstico personalizado.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (WhatsApp / redes sociais) -->
+  <meta property="og:title" content="Cash-Flow | Consultoria Financeira Estratégica">
+  <meta property="og:description" content="Controle seu caixa, forme preços certos e descubra o ponto de equilíbrio do seu negócio. Diagnóstico gratuito.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--navy);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .brand span { color: var(--gold-light); }
+    .header-cta {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 9px 20px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 3px 10px rgba(201,168,76,0.3);
+      white-space: nowrap;
+    }
+    .header-cta:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(201,168,76,0.4); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      padding: 80px 24px 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 60px,
+        rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px
+      );
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      position: relative;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p {
+      color: #8da9c4;
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.65;
+      position: relative;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 15px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+    .btn-outline {
+      display: inline-block;
+      padding: 15px 32px;
+      border: 2px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+    /* ── Stats ── */
+    .stats-bar {
+      background: var(--navy-mid);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      padding: 20px 24px;
+    }
+    .stats-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+    .stat-item {
+      text-align: center;
+      padding: 0 20px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.7rem;
+      color: var(--gold-light);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: #8da9c4;
+      font-weight: 500;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ── Section titles ── */
+    .section {
+      padding: 60px 0;
+    }
+    .section-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--navy);
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .section-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    /* ── Ferramentas ── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .tool-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 22px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      box-shadow: 0 2px 10px rgba(11,37,69,0.06);
+      display: block;
+    }
+    .tool-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.18);
+      transform: translateY(-3px);
+    }
+    .tool-icon {
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+    }
+    .tool-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy-mid);
+      margin-bottom: 8px;
+    }
+    .tool-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .tool-badge {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+    /* ── Como funciona ── */
+    .como-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 640px) { .como-grid { grid-template-columns: 1fr; } }
+
+    .como-item {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      box-shadow: 0 2px 10px rgba(11,37,69,0.06);
+      border: 1.5px solid var(--border);
+      position: relative;
+    }
+    .como-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.5rem;
+      color: rgba(201,168,76,0.2);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .como-item h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--navy-mid);
+      margin-bottom: 8px;
+    }
+    .como-item p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── Sobre / Credibilidade ── */
+    .sobre-section {
+      background: var(--navy);
+      padding: 60px 0;
+    }
+    .sobre-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    @media (max-width: 700px) { .sobre-inner { grid-template-columns: 1fr; text-align: center; } }
+
+    .sobre-foto {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.12);
+      border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      margin: 0 auto;
+    }
+    .sobre-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .sobre-nome {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .sobre-cargo {
+      font-size: 0.88rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .sobre-texto {
+      font-size: 0.88rem;
+      color: #8da9c4;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .sobre-selos {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .selo {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      color: #8da9c4;
+      font-weight: 500;
+    }
+
+    /* ── Contato ── */
+    .contato-section {
+      padding: 60px 0;
+      background: var(--bg);
+    }
+    .contato-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 700px) { .contato-grid { grid-template-columns: 1fr; } }
+
+    .contato-info h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+    .contato-info p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 14px 26px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(37,211,102,0.3);
+    }
+    .btn-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,211,102,0.4); }
+
+    .contato-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08);
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--navy-mid);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      background: #fff;
+    }
+    .btn-enviar {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .btn-enviar:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.4); }
+
+    .aviso-lgpd {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: var(--navy);
+      border-top: 1px solid rgba(201,168,76,0.2);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .site-footer p {
+      color: #8da9c4;
+      font-size: 0.8rem;
+    }
+    .site-footer strong { color: var(--gold-light); }
+
+    /* ── Divisor ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+      .stats-inner { grid-template-columns: 1fr; gap: 20px; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; }
+      .stat-item:last-child { border-bottom: none; }
+      .hero { padding: 56px 20px 48px; }
+      .section { padding: 40px 0; }
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>Cash-Flow</h1>
-    <p>Consultoria Financeira Estratégica</p>
+  <!-- Header -->
+  <header class="site-header">
+    <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+    <a href="#diagnostico" class="header-cta">Diagnóstico Gratuito</a>
   </header>
 
-  <main>
-    <section>
-      <h2>Painel de Ferramentas Corporativas</h2>
-      <p>Selecione o módulo financeiro que deseja gerenciar ou analisar:</p>
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-eyebrow">Consultoria Financeira Estratégica</p>
+    <h1>Seu negócio merece <em>números que fazem sentido</em></h1>
+    <p>Gestão de fluxo de caixa, precificação correta e controle de custos — com clareza, estratégia e ferramentas que funcionam.</p>
+    <div class="hero-btns">
+      <a href="#diagnostico" class="btn-primary">Solicitar Diagnóstico Gratuito</a>
+      <a href="#ferramentas" class="btn-outline">Ver Ferramentas</a>
+    </div>
+  </section>
 
-      <div class="menu-abas">
-        <a href="fluxo-de-caixa.html" class="aba-card">
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Ferramentas gratuitas disponíveis</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Diagnóstico personalizado</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Custo para começar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ferramentas -->
+  <section class="section" id="ferramentas">
+    <div class="container">
+      <div class="section-eyebrow">Ferramentas Gratuitas</div>
+      <h2 class="section-title">Painel de Módulos Financeiros</h2>
+      <p class="section-sub">Selecione a ferramenta que você precisa agora. Todos os cálculos são feitos diretamente no seu navegador — sem cadastro.</p>
+
+      <div class="tools-grid">
+        <a href="fluxo-de-caixa.html" class="tool-card">
+          <div class="tool-icon">📊</div>
           <h3>Simulador de Saúde Financeira</h3>
           <p>Insira receitas e custos e receba um diagnóstico completo com margem de lucro, alertas e plano de ação.</p>
+          <span class="tool-badge">Gratuito</span>
         </a>
-        <a href="fluxo-de-caixa-real.html" class="aba-card">
+        <a href="fluxo-de-caixa-real.html" class="tool-card">
+          <div class="tool-icon">💰</div>
           <h3>Fluxo de Caixa</h3>
           <p>Registre entradas e saídas diárias, acompanhe o saldo em tempo real e receba alertas de saúde financeira.</p>
+          <span class="tool-badge">Gratuito</span>
         </a>
-        <a href="ponto-equilibrio.html" class="aba-card">
-          <h3>Ponto de Equilíbrio (Break-Even)</h3>
+        <a href="ponto-equilibrio.html" class="tool-card">
+          <div class="tool-icon">⚖️</div>
+          <h3>Ponto de Equilíbrio</h3>
           <p>Descubra o faturamento mínimo exato que sua empresa precisa para cobrir todos os custos.</p>
+          <span class="tool-badge">Gratuito</span>
         </a>
-        <a href="formacao-de-preco.html" class="aba-card">
+        <a href="formacao-de-preco.html" class="tool-card">
+          <div class="tool-icon">🏷️</div>
           <h3>Formação de Preço de Venda</h3>
           <p>Calcule o preço ideal com base no custo, impostos e margem desejada — sem queimar a rentabilidade.</p>
+          <span class="tool-badge">Gratuito</span>
         </a>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="diagnostico">
-      <h2>Solicite um Diagnóstico Avançado</h2>
-      <p>Fale conosco e organize as finanças do seu negócio com estratégia e clareza.</p>
-    </section>
-  </main>
+  <div class="divider"></div>
 
-  <footer>
-    <p>&copy; 2026 Cash-Flow Consultoria Financeira. Todos os direitos reservados.</p>
+  <!-- Como funciona -->
+  <section class="section">
+    <div class="container">
+      <div class="section-eyebrow">Como Funciona</div>
+      <h2 class="section-title">Do diagnóstico ao resultado</h2>
+      <p class="section-sub">Um processo direto, sem burocracia, focado em ação imediata para o seu negócio.</p>
+
+      <div class="como-grid">
+        <div class="como-item">
+          <div class="como-num">01</div>
+          <h3>Use as ferramentas gratuitas</h3>
+          <p>Simule seu fluxo de caixa, calcule seu ponto de equilíbrio e descubra se seus preços estão corretos — agora mesmo, sem cadastro.</p>
+        </div>
+        <div class="como-item">
+          <div class="como-num">02</div>
+          <h3>Solicite o diagnóstico</h3>
+          <p>Envie seus dados pelo formulário abaixo. Em até 24h você recebe uma análise financeira personalizada do seu negócio.</p>
+        </div>
+        <div class="como-item">
+          <div class="como-num">03</div>
+          <h3>Implemente com acompanhamento</h3>
+          <p>Receba um plano de ação claro e objetivo, com acompanhamento mensal para garantir a execução e os resultados.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sobre -->
+  <section class="sobre-section">
+    <div class="sobre-inner">
+      <div>
+        <div class="sobre-foto">👤</div>
+      </div>
+      <div>
+        <div class="sobre-eyebrow">Sobre o Consultor</div>
+        <!-- PREENCHA: substitua os dados abaixo com os seus -->
+        <div class="sobre-nome">Seu Nome Aqui</div>
+        <div class="sobre-cargo">Consultor Financeiro · Cash-Flow</div>
+        <p class="sobre-texto">
+          Especialista em gestão financeira para pequenas e médias empresas.
+          Ajudo empreendedores a entender seus números, precificar corretamente
+          e construir operações financeiramente saudáveis e escaláveis.
+          <!-- PREENCHA: adicione sua trajetória, formação ou diferencial aqui -->
+        </p>
+        <div class="sobre-selos">
+          <div class="selo">📍 Rio Branco, AC</div>
+          <!-- PREENCHA: adicione CNPJ, CRC ou certificações se tiver -->
+          <div class="selo">✅ Diagnóstico gratuito</div>
+          <div class="selo">📲 Atendimento via WhatsApp</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contato -->
+  <section class="contato-section" id="diagnostico">
+    <div class="container">
+      <div class="section-eyebrow">Contato</div>
+      <h2 class="section-title">Solicite seu Diagnóstico Gratuito</h2>
+      <p class="section-sub">Preencha o formulário ou entre em contato direto pelo WhatsApp. Respondo em até 24 horas.</p>
+
+      <div class="contato-grid">
+        <div class="contato-info">
+          <h3>Prefere falar agora?</h3>
+          <p>Clique no botão abaixo para iniciar uma conversa pelo WhatsApp. É mais rápido e você já pode tirar suas dúvidas na hora.</p>
+          <!-- PREENCHA: substitua o número pelo seu (com DDI e DDD, sem espaços ou traços) -->
+          <a href="https://wa.me/5568999999999?text=Olá,%20gostaria%20de%20solicitar%20um%20diagnóstico%20financeiro%20gratuito." class="btn-whatsapp" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Falar pelo WhatsApp
+          </a>
+        </div>
+
+        <div class="contato-card">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;">Formulário de Contato</div>
+
+          <div class="form-group">
+            <label for="nome">Seu nome</label>
+            <input type="text" id="nome" placeholder="Ex: João Silva">
+          </div>
+          <div class="form-group">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" placeholder="(68) 9 9999-9999">
+          </div>
+          <div class="form-group">
+            <label for="segmento">Segmento do negócio</label>
+            <select id="segmento">
+              <option value="">Selecione...</option>
+              <option>Comércio</option>
+              <option>Serviços</option>
+              <option>Indústria</option>
+              <option>Alimentação</option>
+              <option>Saúde e estética</option>
+              <option>Tecnologia</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="mensagem">O que você precisa resolver?</label>
+            <textarea id="mensagem" rows="3" placeholder="Ex: Não sei se meu negócio está dando lucro de verdade..."></textarea>
+          </div>
+
+          <!-- ATENÇÃO: este botão abre o WhatsApp com os dados preenchidos.
+               Substitua o número abaixo pelo seu antes de publicar. -->
+          <button class="btn-enviar" onclick="enviarWhatsApp()">Enviar e Falar com Consultor</button>
+          <p class="aviso-lgpd">Seus dados são usados exclusivamente para o contato de diagnóstico. Não compartilhamos com terceiros. (LGPD)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; 2026 <strong>Cash-Flow</strong> Consultoria Financeira. Todos os direitos reservados.</p>
+    <!-- PREENCHA: adicione CNPJ se tiver registro formal -->
   </footer>
+
+  <script>
+    function enviarWhatsApp() {
+      const nome      = document.getElementById('nome').value.trim();
+      const whatsapp  = document.getElementById('whatsapp').value.trim();
+      const segmento  = document.getElementById('segmento').value;
+      const mensagem  = document.getElementById('mensagem').value.trim();
+
+      if (!nome || !whatsapp) {
+        alert('Preencha pelo menos seu nome e WhatsApp para continuar.');
+        return;
+      }
+
+      const texto = `Olá! Me chamo *${nome}* e gostaria de um diagnóstico financeiro gratuito.\n\n` +
+                    `📱 WhatsApp: ${whatsapp}\n` +
+                    `🏢 Segmento: ${segmento || 'Não informado'}\n\n` +
+                    `📝 O que preciso resolver:\n${mensagem || 'Não informado'}`;
+
+      // PREENCHA: substitua o número pelo seu (DDI+DDD+número, sem espaços)
+      const numero = '5568999999999';
+      window.open(`https://wa.me/${numero}?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+  </script>
 
 </body>
 </html>
