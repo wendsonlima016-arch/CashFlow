@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formação de Preço | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --red-bd:     #f1a9a0;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --amber-bd:   #f5d08a;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--navy);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .brand span { color: var(--gold-light); }
+    .back-link {
+      font-size: 0.8rem;
+      color: var(--gold-light);
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center;
+      padding: 56px 24px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 60px,
+        rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px
+      );
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p {
+      color: #8da9c4;
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Conceito box ── */
+    .conceito {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .conceito-icon { font-size: 2.2rem; flex-shrink: 0; margin-top: 2px; }
+    .conceito h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+    .conceito p {
+      font-size: 0.86rem;
+      color: #8da9c4;
+      line-height: 1.65;
+    }
+    .conceito strong { color: #fff; }
+    .formula-box {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-top: 14px;
+      font-size: 0.88rem;
+      color: var(--gold-light);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Inputs ── */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 640px) { .input-grid { grid-template-columns: 1fr; } }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .input-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--navy-mid);
+    }
+    .input-group .hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: -3px;
+      line-height: 1.4;
+    }
+    .input-wrapper { position: relative; }
+    .input-wrapper .prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%;
+      padding: 12px 12px 12px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+      background: #fff;
+    }
+
+    .btn-calcular {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: var(--navy);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+    .btn-calcular:active { transform: translateY(0); }
+
+    /* ── Resultado ── */
+    #resultado { display: none; }
+    #resultado.visible { display: block; }
+
+    /* Destaque principal */
+    .preco-destaque {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 560px) { .preco-destaque { grid-template-columns: 1fr; } }
+
+    .pd-card {
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      text-align: center;
+      border: 2px solid transparent;
+    }
+    .pd-card.preco {
+      background: var(--navy);
+      border-color: var(--gold);
+    }
+    .pd-card.lucro {
+      background: var(--green-bg);
+      border-color: var(--green-bd);
+    }
+    .pd-card .pd-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .pd-card.preco .pd-label { color: var(--gold); }
+    .pd-card.lucro .pd-label { color: var(--green); }
+    .pd-card .pd-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .pd-card.preco .pd-value { color: var(--gold-light); }
+    .pd-card.lucro .pd-value { color: var(--green); }
+    .pd-card .pd-sub {
+      font-size: 0.8rem;
+    }
+    .pd-card.preco .pd-sub { color: #8da9c4; }
+    .pd-card.lucro .pd-sub { color: var(--muted); }
+
+    /* KPI breakdown */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .kpi-mini {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 1px 6px rgba(11,37,69,0.05);
+    }
+    .kpi-mini .km-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .kpi-mini .km-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--navy-mid);
+    }
+    .kpi-mini .km-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Barra de composição */
+    .composicao-section {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 16px rgba(11,37,69,0.06);
+    }
+    .comp-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .comp-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .comp-bar-track {
+      height: 28px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 16px;
+    }
+    .comp-seg {
+      height: 100%;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .comp-seg.custo   { background: var(--navy-mid); }
+    .comp-seg.imposto { background: var(--amber); }
+    .comp-seg.lucro   { background: var(--green); }
+
+    .comp-legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .comp-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+    .comp-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .comp-dot.custo   { background: var(--navy-mid); }
+    .comp-dot.imposto { background: var(--amber); }
+    .comp-dot.lucro   { background: var(--green); }
+
+    /* Alertas */
+    .alert-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      border-left: 4px solid transparent;
+      margin-bottom: 12px;
+    }
+    .alert-item:last-child { margin-bottom: 0; }
+    .alert-item.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-item.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .alert-item.red   { background: var(--red-bg);   border-color: var(--red); }
+    .alert-item .ai-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-item .ai-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .alert-item.green .ai-title { color: var(--green); }
+    .alert-item.amber .ai-title { color: var(--amber); }
+    .alert-item.red   .ai-title { color: var(--red); }
+    .alert-item .ai-text { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
+
+    /* CTA */
+    .cta-footer {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      text-align: center;
+      margin-top: 24px;
+    }
+    .cta-footer h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .cta-footer p {
+      color: #8da9c4;
+      font-size: 0.88rem;
+      margin-bottom: 22px;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-footer a {
+      display: inline-block;
+      padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .card { padding: 22px 18px; }
+      .conceito { flex-direction: column; gap: 12px; }
+      .composicao-section { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+    <a href="index.html" class="back-link">← Voltar ao Painel</a>
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Precificação Estratégica</p>
+    <h1>Formação de <em>Preço de Venda</em></h1>
+    <p>Calcule o preço ideal do seu produto ou serviço com base no custo real, carga tributária e margem de lucro desejada.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- O que é -->
+    <div class="conceito">
+      <div class="conceito-icon">🏷️</div>
+      <div>
+        <h2>Por que a fórmula importa?</h2>
+        <p>
+          Precificar errado é o principal motivo pelo qual negócios lucrativos "no papel" quebram na prática.
+          A maioria dos empreendedores aplica a margem <strong>sobre o custo</strong> — mas impostos e lucro
+          incidem sobre o <strong>preço de venda</strong>. Ignorar isso comprime a margem real sem que você perceba.
+        </p>
+        <div class="formula-box">
+          Preço de Venda = Custo ÷ (1 − (Impostos% + Margem%) ÷ 100)
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculadora -->
+    <div class="card">
+      <div class="card-title">Dados do produto ou serviço</div>
+      <div class="input-grid">
+
+        <div class="input-group">
+          <label for="custo">Custo do Produto / Serviço</label>
+          <p class="hint">Custo direto total para entregar o produto ou serviço ao cliente.</p>
+          <div class="input-wrapper">
+            <span class="prefix">R$</span>
+            <input type="number" id="custo" placeholder="0,00" min="0.01" step="0.01">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="impostos">Impostos e Taxas</label>
+          <p class="hint">Alíquota total incidente sobre o preço de venda (Simples, ISS, ICMS, etc.).</p>
+          <div class="input-wrapper">
+            <span class="prefix">%</span>
+            <input type="number" id="impostos" placeholder="0,0" min="0" max="99" step="0.1">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="margem">Margem de Lucro Desejada</label>
+          <p class="hint">Percentual de lucro líquido que você quer obter sobre o preço final.</p>
+          <div class="input-wrapper">
+            <span class="prefix">%</span>
+            <input type="number" id="margem" placeholder="0,0" min="0.1" max="99" step="0.5">
+          </div>
+        </div>
+
+      </div>
+      <button class="btn-calcular" onclick="calcular()">Calcular Preço de Venda</button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultado">
+
+      <!-- Destaques principais -->
+      <div class="preco-destaque">
+        <div class="pd-card preco">
+          <div class="pd-label">Preço de Venda Ideal</div>
+          <div class="pd-value" id="res-preco">—</div>
+          <div class="pd-sub" id="res-preco-sub">—</div>
+        </div>
+        <div class="pd-card lucro">
+          <div class="pd-label">Lucro Líquido por Venda</div>
+          <div class="pd-value" id="res-lucro">—</div>
+          <div class="pd-sub" id="res-lucro-sub">—</div>
+        </div>
+      </div>
+
+      <!-- KPI breakdown -->
+      <div class="kpi-row">
+        <div class="kpi-mini">
+          <div class="km-label">Custo</div>
+          <div class="km-value" id="kpi-custo">—</div>
+          <div class="km-sub" id="kpi-custo-pct">— do preço</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="km-label">Impostos em R$</div>
+          <div class="km-value" id="kpi-impostos">—</div>
+          <div class="km-sub" id="kpi-impostos-pct">— sobre o preço</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="km-label">Lucro em R$</div>
+          <div class="km-value" id="kpi-lucro">—</div>
+          <div class="km-sub" id="kpi-lucro-pct">— sobre o preço</div>
+        </div>
+        <div class="kpi-mini">
+          <div class="km-label">Markup Aplicado</div>
+          <div class="km-value" id="kpi-markup">—</div>
+          <div class="km-sub">sobre o custo</div>
+        </div>
+      </div>
+
+      <!-- Composição do preço -->
+      <div class="composicao-section">
+        <div class="comp-title">Composição do Preço de Venda</div>
+        <div class="comp-bar-track">
+          <div class="comp-seg custo"   id="bar-custo"   style="width:0%"></div>
+          <div class="comp-seg imposto" id="bar-imposto" style="width:0%"></div>
+          <div class="comp-seg lucro"   id="bar-lucro"   style="width:0%"></div>
+        </div>
+        <div class="comp-legend">
+          <div class="comp-legend-item">
+            <div class="comp-dot custo"></div>
+            <span>Custo (<span id="leg-custo">—</span>)</span>
+          </div>
+          <div class="comp-legend-item">
+            <div class="comp-dot imposto"></div>
+            <span>Impostos (<span id="leg-imposto">—</span>)</span>
+          </div>
+          <div class="comp-legend-item">
+            <div class="comp-dot lucro"></div>
+            <span>Lucro (<span id="leg-lucro">—</span>)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Análise e alertas -->
+      <div class="card">
+        <div class="card-title">Análise de Precificação</div>
+        <div id="alertas-list"></div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-footer">
+      <h3>Quer precificar toda a sua linha?</h3>
+      <p>Nossa consultoria estrutura a política de preços completa do seu negócio — por produto, canal e segmento de cliente.</p>
+      <a href="index.html#diagnostico">Falar com um Consultor</a>
+    </div>
+
+  </div>
+
+  <script>
+    function fmt(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+    function fmtPct(val) {
+      return val.toFixed(1) + '%';
+    }
+
+    function calcular() {
+      const custo    = parseFloat(document.getElementById('custo').value)    || 0;
+      const impostos = parseFloat(document.getElementById('impostos').value) || 0;
+      const margem   = parseFloat(document.getElementById('margem').value)   || 0;
+
+      if (custo <= 0)  { alert('Informe o custo do produto ou serviço.'); return; }
+      if (margem <= 0) { alert('Informe a margem de lucro desejada.'); return; }
+
+      const totalPct = impostos + margem;
+      if (totalPct >= 100) {
+        alert('A soma de impostos e margem não pode atingir 100% — não sobraria nada para cobrir o custo.');
+        return;
+      }
+
+      // ── Fórmula principal ──
+      // Preço = Custo ÷ (1 − (Impostos% + Margem%) / 100)
+      const divisor   = 1 - (totalPct / 100);
+      const preco     = custo / divisor;
+      const lucroReais   = preco * (margem   / 100);
+      const impostosReais = preco * (impostos / 100);
+      const custoPct  = (custo        / preco) * 100;
+      const markup    = ((preco / custo) - 1) * 100;
+
+      // ── Destaques ──
+      document.getElementById('res-preco').textContent    = fmt(preco);
+      document.getElementById('res-preco-sub').textContent = `Markup de ${fmtPct(markup)} sobre o custo`;
+      document.getElementById('res-lucro').textContent    = fmt(lucroReais);
+      document.getElementById('res-lucro-sub').textContent = `${fmtPct(margem)} do preço de venda`;
+
+      // ── KPIs ──
+      document.getElementById('kpi-custo').textContent        = fmt(custo);
+      document.getElementById('kpi-custo-pct').textContent    = fmtPct(custoPct) + ' do preço';
+      document.getElementById('kpi-impostos').textContent     = fmt(impostosReais);
+      document.getElementById('kpi-impostos-pct').textContent = fmtPct(impostos) + ' sobre o preço';
+      document.getElementById('kpi-lucro').textContent        = fmt(lucroReais);
+      document.getElementById('kpi-lucro-pct').textContent    = fmtPct(margem) + ' sobre o preço';
+      document.getElementById('kpi-markup').textContent       = fmtPct(markup);
+
+      // ── Barra de composição ──
+      setTimeout(() => {
+        document.getElementById('bar-custo').style.width   = custoPct + '%';
+        document.getElementById('bar-imposto').style.width = impostos + '%';
+        document.getElementById('bar-lucro').style.width   = margem   + '%';
+        // Labels dentro da barra (só se tiver espaço)
+        document.getElementById('bar-custo').textContent   = custoPct > 15 ? fmtPct(custoPct)  : '';
+        document.getElementById('bar-imposto').textContent = impostos  > 8  ? fmtPct(impostos)  : '';
+        document.getElementById('bar-lucro').textContent   = margem    > 8  ? fmtPct(margem)    : '';
+      }, 100);
+      document.getElementById('leg-custo').textContent   = fmtPct(custoPct);
+      document.getElementById('leg-imposto').textContent = fmtPct(impostos);
+      document.getElementById('leg-lucro').textContent   = fmtPct(margem);
+
+      // ── Alertas de análise ──
+      const alertas = [];
+
+      // Margem < 10%
+      if (margem < 10) {
+        alertas.push({ color: 'red', icon: '🚨', title: 'Margem de Lucro Muito Baixa',
+          text: `${fmtPct(margem)} de margem é insuficiente para absorver variações de custo ou inadimplência. ` +
+                `O mínimo recomendado para sustentabilidade é 15%. Para chegar lá, o preço ideal seria ${fmt(custo / (1 - (impostos + 15) / 100))}.`
+        });
+      } else if (margem < 20) {
+        alertas.push({ color: 'amber', icon: '⚠️', title: 'Margem Funcional, mas Estreita',
+          text: `${fmtPct(margem)} garante alguma rentabilidade, mas deixa pouca margem de segurança. ` +
+                `Com 20% de margem, o preço seria ${fmt(custo / (1 - (impostos + 20) / 100))} — um ajuste de ${fmt(custo / (1 - (impostos + 20) / 100) - preco)}.`
+        });
+      } else {
+        alertas.push({ color: 'green', icon: '✅', title: 'Margem de Lucro Saudável',
+          text: `${fmtPct(margem)} de margem é competitivo e sustentável. Você tem espaço para absorver custos inesperados e ainda gerar caixa para reinvestimento.`
+        });
+      }
+
+      // Impostos altos
+      if (impostos > 15) {
+        alertas.push({ color: 'amber', icon: '🏛️', title: `Carga Tributária Significativa — ${fmtPct(impostos)}`,
+          text: `Tributos representam ${fmt(impostosReais)} em cada venda. Avalie se o regime tributário atual (Simples, Lucro Presumido) é o mais eficiente para o seu volume. Uma revisão com contador pode reduzir essa alíquota.`
+        });
+      }
+
+      // Custo > 70% do preço
+      if (custoPct > 70) {
+        alertas.push({ color: 'amber', icon: '⚙️', title: 'Custo Representa Parcela Elevada do Preço',
+          text: `O custo consome ${fmtPct(custoPct)} do preço final. Há pouca flexibilidade para descontos ou promoções sem comprometer o resultado. Avalie se é possível reduzir custos diretos ou reposicionar o produto com maior valor percebido.`
+        });
+      }
+
+      // Markup > 100%
+      if (markup > 100) {
+        alertas.push({ color: 'green', icon: '🚀', title: `Markup Elevado — ${fmtPct(markup)} sobre o custo`,
+          text: `Um markup acima de 100% é típico de produtos/serviços com alto valor percebido ou baixo custo direto. Certifique-se de que o preço final está dentro da realidade competitiva do seu mercado.`
+        });
+      }
+
+      // Imposto zero
+      if (impostos === 0) {
+        alertas.push({ color: 'amber', icon: '📋', title: 'Impostos informados como zero',
+          text: 'Verifique se o campo de impostos está correto. Mesmo no MEI ou Simples Nacional há tributação. Ignorar os tributos na formação de preço resulta em margem real menor do que a calculada.'
+        });
+      }
+
+      const lista = document.getElementById('alertas-list');
+      lista.innerHTML = alertas.map(a => `
+        <div class="alert-item ${a.color}">
+          <div class="ai-icon">${a.icon}</div>
+          <div>
+            <div class="ai-title">${a.title}</div>
+            <div class="ai-text">${a.text}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Exibir
+      const res = document.getElementById('resultado');
+      res.classList.add('visible');
+      setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    }
+  </script>
+
+</body>
+</html>
