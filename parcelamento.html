@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Parcelamento | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --red-bd:     #f1a9a0;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --amber-bd:   #f5d08a;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .site-header {
+      background: var(--navy); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; text-decoration: none; }
+    .brand span { color: var(--gold-light); }
+    .back-link { font-size: 0.8rem; color: var(--gold-light); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 1; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center; padding: 56px 24px 48px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px);
+    }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 14px; position: relative; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #fff; line-height: 1.2; margin-bottom: 14px; position: relative; }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p { color: #8da9c4; font-size: 1rem; max-width: 520px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    .conceito {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 28px 32px; margin-bottom: 24px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .conceito-icon { font-size: 2.2rem; flex-shrink: 0; margin-top: 2px; }
+    .conceito h2 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--gold-light); margin-bottom: 8px; }
+    .conceito p { font-size: 0.86rem; color: #8da9c4; line-height: 1.65; }
+    .conceito strong { color: #fff; }
+
+    .card {
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08); padding: 32px; margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Modo toggle */
+    .modo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .modo-btn {
+      padding: 12px; border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 600;
+      cursor: pointer; background: #f8fafc; color: var(--muted); transition: all 0.15s;
+    }
+    .modo-btn.active { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .modo-btn:hover:not(.active) { border-color: var(--gold); }
+
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .input-group { display: flex; flex-direction: column; gap: 7px; }
+    .input-group label { font-size: 0.82rem; font-weight: 600; color: var(--navy-mid); }
+    .input-group .hint { font-size: 0.7rem; color: var(--muted); line-height: 1.4; }
+
+    .input-wrapper { position: relative; }
+    .input-wrapper .prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-weight: 600; font-size: 0.88rem; color: var(--muted); pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%; padding: 12px 12px 12px 36px;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500;
+      color: var(--text); background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15); background: #fff;
+    }
+
+    .btn-calcular {
+      display: block; width: 100%; margin-top: 28px; padding: 16px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-family: 'Inter', sans-serif; font-size: 1rem;
+      font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+
+    #resultado { display: none; }
+    #resultado.visible { display: block; }
+
+    /* KPIs */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    @media (max-width: 640px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .kpi-card {
+      border-radius: var(--radius-lg); padding: 20px 16px;
+      border: 1.5px solid transparent; text-align: center;
+    }
+    .kpi-card.navy   { background: var(--navy);    border-color: var(--gold); }
+    .kpi-card.green  { background: var(--green-bg); border-color: var(--green-bd); }
+    .kpi-card.red    { background: var(--red-bg);   border-color: var(--red-bd); }
+    .kpi-card.amber  { background: var(--amber-bg); border-color: var(--amber-bd); }
+    .kpi-icon  { font-size: 1.4rem; margin-bottom: 6px; }
+    .kpi-label { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+    .kpi-card.navy  .kpi-label { color: var(--gold); }
+    .kpi-card.green .kpi-label { color: var(--green); }
+    .kpi-card.red   .kpi-label { color: var(--red); }
+    .kpi-card.amber .kpi-label { color: var(--amber); }
+    .kpi-value { font-family: 'DM Serif Display', serif; font-size: 1.45rem; line-height: 1.1; }
+    .kpi-card.navy  .kpi-value { color: var(--gold-light); }
+    .kpi-card.green .kpi-value { color: var(--green); }
+    .kpi-card.red   .kpi-value { color: var(--red); }
+    .kpi-card.amber .kpi-value { color: var(--amber); }
+    .kpi-sub { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+    .kpi-card.navy .kpi-sub { color: #8da9c4; }
+
+    /* Tabela parcelas */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1.5px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    thead th {
+      text-align: left; padding: 10px 14px;
+      font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); border-bottom: 2px solid var(--border); background: #f8fafc; white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody tr:last-child { border-bottom: none; background: rgba(201,168,76,0.05); font-weight: 600; }
+    tbody td { padding: 10px 14px; vertical-align: middle; }
+    .td-parc  { color: var(--muted); font-size: 0.78rem; }
+    .td-valor { font-weight: 700; color: var(--navy-mid); }
+    .td-juros { color: var(--red); }
+    .td-amort { color: var(--green); }
+    .td-saldo { color: var(--muted); }
+
+    /* Alertas */
+    .alert-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px 18px; border-radius: var(--radius);
+      border-left: 4px solid transparent; margin-bottom: 12px;
+    }
+    .alert-item:last-child { margin-bottom: 0; }
+    .alert-item.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-item.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .alert-item.red   { background: var(--red-bg);   border-color: var(--red); }
+    .ai-icon  { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .ai-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .alert-item.green .ai-title { color: var(--green); }
+    .alert-item.amber .ai-title { color: var(--amber); }
+    .alert-item.red   .ai-title { color: var(--red); }
+    .ai-text  { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
+
+    .cta-footer {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 36px 32px; text-align: center; margin-top: 24px;
+    }
+    .cta-footer h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #fff; margin-bottom: 8px; }
+    .cta-footer p  { color: #8da9c4; font-size: 0.88rem; margin-bottom: 22px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .cta-footer a  {
+      display: inline-block; padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-weight: 700; font-size: 0.9rem;
+      border-radius: var(--radius); text-decoration: none;
+      transition: transform 0.15s; box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .conceito { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+  <a href="index.html" class="back-link">← Voltar ao Painel</a>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">Crédito e Financiamento</p>
+  <h1>Simulador de <em>Parcelamento</em></h1>
+  <p>Calcule o valor das parcelas, o total de juros pagos e veja a tabela de amortização completa — para compras ou vendas a prazo.</p>
+</section>
+
+<div class="container">
+
+  <div class="conceito">
+    <div class="conceito-icon">💳</div>
+    <div>
+      <h2>Price ou SAC — qual a diferença?</h2>
+      <p>
+        Na <strong>Tabela Price</strong> as parcelas são fixas, mas no início você paga mais juros e menos amortização.
+        É o modelo mais comum no varejo e cartão de crédito.<br><br>
+        Na <strong>Tabela SAC</strong> a amortização é constante, então os juros e a parcela diminuem a cada mês.
+        Você paga <strong>menos juros no total</strong>, mas a primeira parcela é maior.
+        Simule os dois e compare antes de decidir.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Dados do Parcelamento</div>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:0.82rem;font-weight:600;color:var(--navy-mid);display:block;margin-bottom:10px;">Sistema de Amortização</label>
+      <div class="modo-row">
+        <button class="modo-btn active" id="btn-price" onclick="setModo('price')">📊 Tabela Price (parcela fixa)</button>
+        <button class="modo-btn"        id="btn-sac"   onclick="setModo('sac')">📉 Tabela SAC (amortização fixa)</button>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="valor">Valor Financiado</label>
+        <p class="hint">Valor total da compra ou empréstimo.</p>
+        <div class="input-wrapper"><span class="prefix">R$</span>
+          <input type="number" id="valor" placeholder="0,00" min="0.01" step="100">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="taxa">Taxa de Juros Mensal</label>
+        <p class="hint">Informe a taxa ao mês (ex: 2,99% ao mês).</p>
+        <div class="input-wrapper"><span class="prefix">%</span>
+          <input type="number" id="taxa" placeholder="0,00" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="parcelas">Número de Parcelas</label>
+        <p class="hint">Quantidade de meses do financiamento.</p>
+        <div class="input-wrapper"><span class="prefix">nº</span>
+          <input type="number" id="parcelas" placeholder="12" min="1" max="360" step="1">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="entrada">Entrada (opcional)</label>
+        <p class="hint">Valor pago à vista antes do parcelamento.</p>
+        <div class="input-wrapper"><span class="prefix">R$</span>
+          <input type="number" id="entrada" placeholder="0,00" min="0" step="100">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-calcular" onclick="calcular()">Simular Parcelamento</button>
+  </div>
+
+  <div id="resultado">
+
+    <div class="kpi-row" id="kpi-row"></div>
+
+    <div class="card">
+      <div class="card-title">Tabela de Amortização</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Parcela</th>
+              <th>Valor da Parcela</th>
+              <th>Juros</th>
+              <th>Amortização</th>
+              <th>Saldo Devedor</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Análise</div>
+      <div id="alertas-list"></div>
+    </div>
+
+  </div>
+
+  <div class="cta-footer">
+    <h3>Parcelamento pesando no caixa?</h3>
+    <p>Posso te ajudar a avaliar se vale refinanciar, antecipar parcelas ou renegociar condições com o credor.</p>
+    <a href="index.html#contato">Falar com o Consultor</a>
+  </div>
+
+</div>
+
+<script>
+  let modoAtivo = 'price';
+
+  function setModo(m) {
+    modoAtivo = m;
+    document.getElementById('btn-price').className = 'modo-btn' + (m === 'price' ? ' active' : '');
+    document.getElementById('btn-sac').className   = 'modo-btn' + (m === 'sac'   ? ' active' : '');
+  }
+
+  function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+  function fmtPct(v) { return v.toFixed(2) + '%'; }
+
+  function calcular() {
+    const valorTotal = parseFloat(document.getElementById('valor').value)    || 0;
+    const taxa       = parseFloat(document.getElementById('taxa').value)     || 0;
+    const nParcelas  = parseInt(document.getElementById('parcelas').value)   || 0;
+    const entrada    = parseFloat(document.getElementById('entrada').value)  || 0;
+
+    if (valorTotal <= 0) { alert('Informe o valor financiado.'); return; }
+    if (nParcelas  <= 0) { alert('Informe o número de parcelas.'); return; }
+    if (entrada >= valorTotal) { alert('A entrada não pode ser maior ou igual ao valor total.'); return; }
+
+    const pv  = valorTotal - entrada; // saldo a financiar
+    const i   = taxa / 100;
+
+    // ── Gera tabela ──
+    const linhas = [];
+    let totalJuros = 0;
+    let totalPago  = entrada;
+
+    if (modoAtivo === 'price') {
+      // Parcela fixa: PMT = PV * i / (1-(1+i)^-n)
+      const pmt = i === 0
+        ? pv / nParcelas
+        : pv * i / (1 - Math.pow(1 + i, -nParcelas));
+
+      let saldo = pv;
+      for (let k = 1; k <= nParcelas; k++) {
+        const jurosPeriodo = saldo * i;
+        const amort        = pmt - jurosPeriodo;
+        saldo             -= amort;
+        if (saldo < 0.005) saldo = 0;
+        totalJuros += jurosPeriodo;
+        totalPago  += pmt;
+        linhas.push({ k, parcela: pmt, juros: jurosPeriodo, amort, saldo });
+      }
+    } else {
+      // SAC: amortização fixa
+      const amortFix = pv / nParcelas;
+      let saldo = pv;
+      for (let k = 1; k <= nParcelas; k++) {
+        const jurosPeriodo = saldo * i;
+        const parcela      = amortFix + jurosPeriodo;
+        saldo             -= amortFix;
+        if (saldo < 0.005) saldo = 0;
+        totalJuros += jurosPeriodo;
+        totalPago  += parcela;
+        linhas.push({ k, parcela, juros: jurosPeriodo, amort: amortFix, saldo });
+      }
+    }
+
+    const primeiraParcela = linhas[0].parcela;
+    const ultimaParcela   = linhas[linhas.length - 1].parcela;
+    const taxaAnual       = (Math.pow(1 + i, 12) - 1) * 100;
+    const custoEfetivo    = (totalJuros / pv) * 100;
+
+    // ── KPIs ──
+    const kpis = [
+      { icon: '💳', label: modoAtivo === 'price' ? 'Parcela Fixa' : '1ª Parcela',
+        value: fmt(primeiraParcela), sub: `${nParcelas}x`, color: 'navy' },
+      { icon: '💰', label: 'Total a Pagar',
+        value: fmt(totalPago), sub: `Entrada + ${nParcelas} parcelas`, color: 'amber' },
+      { icon: '📈', label: 'Total de Juros',
+        value: fmt(totalJuros), sub: fmtPct(custoEfetivo) + ' do financiado', color: 'red' },
+      { icon: '📅', label: 'Taxa Anual Efetiva',
+        value: fmtPct(taxaAnual), sub: fmtPct(taxa) + ' ao mês', color: 'green' },
+    ];
+
+    document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+      <div class="kpi-card ${k.color}">
+        <div class="kpi-icon">${k.icon}</div>
+        <div class="kpi-label">${k.label}</div>
+        <div class="kpi-value">${k.value}</div>
+        <div class="kpi-sub">${k.sub}</div>
+      </div>`).join('');
+
+    // ── Tabela (máx 60 linhas) ──
+    const MAX = 60;
+    let exibir = linhas;
+    if (linhas.length > MAX) {
+      const passo = Math.ceil(linhas.length / MAX);
+      exibir = linhas.filter((_, i) => i % passo === 0 || i === linhas.length - 1);
+    }
+
+    document.getElementById('tabela-body').innerHTML = exibir.map((l, idx) => {
+      const isLast = idx === exibir.length - 1;
+      return `<tr>
+        <td class="td-parc">${isLast ? `<strong>${l.k}ª</strong>` : `${l.k}ª`}</td>
+        <td class="td-valor">${fmt(l.parcela)}</td>
+        <td class="td-juros">${fmt(l.juros)}</td>
+        <td class="td-amort">${fmt(l.amort)}</td>
+        <td class="td-saldo">${fmt(l.saldo)}</td>
+      </tr>`;
+    }).join('');
+
+    // ── Alertas ──
+    const alertas = [];
+
+    if (custoEfetivo > 50) {
+      alertas.push({ color: 'red', icon: '🚨', title: `Custo do Crédito Muito Alto — ${fmtPct(custoEfetivo)} sobre o valor financiado`,
+        text: `Você pagará <strong>${fmt(totalJuros)}</strong> só de juros. Avalie se é possível reduzir o prazo, aumentar a entrada ou buscar uma taxa menor antes de fechar o contrato.` });
+    } else if (custoEfetivo > 20) {
+      alertas.push({ color: 'amber', icon: '⚠️', title: `Juros Representam ${fmtPct(custoEfetivo)} do Valor Financiado`,
+        text: `O custo do crédito é relevante. Se possível, aumente a entrada ou reduza o prazo para diminuir o total de juros pagos.` });
+    } else {
+      alertas.push({ color: 'green', icon: '✅', title: 'Custo do Crédito Controlado',
+        text: `Os juros representam ${fmtPct(custoEfetivo)} do valor financiado — dentro de um nível aceitável. Mantenha as parcelas dentro do orçamento mensal.` });
+    }
+
+    if (taxa > 3) {
+      alertas.push({ color: 'red', icon: '📈', title: `Taxa Elevada — ${fmtPct(taxa)} ao mês equivale a ${fmtPct(taxaAnual)} ao ano`,
+        text: `Taxas acima de 3% ao mês são típicas de cartão de crédito rotativo e cheque especial. Se for possível, substitua por uma linha de crédito mais barata.` });
+    }
+
+    if (modoAtivo === 'price' && nParcelas > 1) {
+      const economiaPrice = totalJuros;
+      // Simula SAC para comparar
+      let totalJurosSac = 0;
+      const amortFix = pv / nParcelas;
+      let saldoSac = pv;
+      for (let k = 0; k < nParcelas; k++) {
+        totalJurosSac += saldoSac * i;
+        saldoSac -= amortFix;
+      }
+      const economia = economiaPrice - totalJurosSac;
+      if (economia > 0) {
+        alertas.push({ color: 'amber', icon: '💡', title: 'Tabela SAC pagaria menos juros',
+          text: `No sistema SAC você economizaria <strong>${fmt(economia)}</strong> em juros no total, mas a primeira parcela seria ${fmt(linhas[0].amort * (1 + i))} — ${fmt(linhas[0].amort * (1+i) - primeiraParcela)} a mais que na Price. Vale a pena se o fluxo de caixa permitir.` });
+      }
+    }
+
+    if (entrada > 0) {
+      alertas.push({ color: 'green', icon: '🎯', title: `Entrada de ${fmt(entrada)} reduz o custo total`,
+        text: `Graças à entrada, o valor financiado caiu para ${fmt(pv)}. Sem ela, os juros totais seriam aproximadamente ${fmt(totalJuros * (valorTotal / pv))}.` });
+    }
+
+    document.getElementById('alertas-list').innerHTML = alertas.map(a => `
+      <div class="alert-item ${a.color}">
+        <div class="ai-icon">${a.icon}</div>
+        <div>
+          <div class="ai-title">${a.title}</div>
+          <div class="ai-text">${a.text}</div>
+        </div>
+      </div>`).join('');
+
+    const res = document.getElementById('resultado');
+    res.classList.add('visible');
+    setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+</script>
+</body>
+</html>
