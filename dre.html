@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRE Simplificada | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --red-bd:     #f1a9a0;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --amber-bd:   #f5d08a;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .site-header {
+      background: var(--navy); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; text-decoration: none; }
+    .brand span { color: var(--gold-light); }
+    .back-link { font-size: 0.8rem; color: var(--gold-light); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 1; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center; padding: 56px 24px 48px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px);
+    }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 14px; position: relative; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #fff; line-height: 1.2; margin-bottom: 14px; position: relative; }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p { color: #8da9c4; font-size: 1rem; max-width: 520px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    .conceito {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 28px 32px; margin-bottom: 24px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .conceito-icon { font-size: 2.2rem; flex-shrink: 0; margin-top: 2px; }
+    .conceito h2 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--gold-light); margin-bottom: 8px; }
+    .conceito p { font-size: 0.86rem; color: #8da9c4; line-height: 1.65; }
+    .conceito strong { color: #fff; }
+
+    .card {
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08); padding: 28px; margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Grupos de input */
+    .grupo { margin-bottom: 28px; }
+    .grupo-titulo {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--navy-mid);
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .grupo-titulo .gt-icon { font-size: 1rem; }
+
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 0.78rem; font-weight: 600; color: var(--navy-mid); }
+    .input-group .hint { font-size: 0.7rem; color: var(--muted); line-height: 1.4; }
+
+    .input-wrapper { position: relative; }
+    .input-wrapper .prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-weight: 600; font-size: 0.88rem; color: var(--muted); pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%; padding: 10px 10px 10px 34px;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500;
+      color: var(--text); background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15); background: #fff;
+    }
+
+    .btn-calcular {
+      display: block; width: 100%; margin-top: 8px; padding: 15px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-family: 'Inter', sans-serif; font-size: 1rem;
+      font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+
+    /* Resultado */
+    #resultado { display: none; }
+    #resultado.visible { display: block; }
+
+    /* KPIs */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    @media (max-width: 640px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .kpi-card {
+      border-radius: var(--radius-lg); padding: 20px 16px;
+      border: 1.5px solid transparent; text-align: center;
+    }
+    .kpi-card.green  { background: var(--green-bg); border-color: var(--green-bd); }
+    .kpi-card.red    { background: var(--red-bg);   border-color: var(--red-bd); }
+    .kpi-card.amber  { background: var(--amber-bg); border-color: var(--amber-bd); }
+    .kpi-card.neutral{ background: #f0f4f8; border-color: var(--border); }
+    .kpi-icon { font-size: 1.4rem; margin-bottom: 6px; }
+    .kpi-label { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .kpi-value { font-family: 'DM Serif Display', serif; font-size: 1.45rem; line-height: 1.1; }
+    .kpi-card.green  .kpi-value { color: var(--green); }
+    .kpi-card.red    .kpi-value { color: var(--red); }
+    .kpi-card.amber  .kpi-value { color: var(--amber); }
+    .kpi-card.neutral .kpi-value { color: var(--navy-mid); }
+    .kpi-sub { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+    /* Tabela DRE */
+    .dre-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    .dre-table tr { border-bottom: 1px solid var(--border); }
+    .dre-table tr:last-child { border-bottom: none; }
+    .dre-table td { padding: 10px 14px; vertical-align: middle; }
+    .dre-table .td-label { color: var(--text); }
+    .dre-table .td-valor { text-align: right; font-weight: 600; white-space: nowrap; }
+    .dre-table .td-pct   { text-align: right; font-size: 0.75rem; color: var(--muted); white-space: nowrap; width: 70px; }
+
+    .dre-linha-receita   td { background: rgba(11,37,69,0.03); }
+    .dre-linha-subtotal  td { background: #f8fafc; font-weight: 700; }
+    .dre-linha-destaque  td { background: var(--navy); border-radius: 0; }
+    .dre-linha-destaque .td-label { color: var(--gold-light); font-weight: 700; font-size: 0.9rem; }
+    .dre-linha-destaque .td-valor { color: #fff; font-size: 1rem; }
+    .dre-linha-destaque .td-pct   { color: rgba(255,255,255,0.5); }
+
+    .dre-linha-positivo .td-valor { color: var(--green); }
+    .dre-linha-negativo .td-valor { color: var(--red); }
+    .dre-linha-secao td { padding-top: 18px; padding-bottom: 4px; }
+    .dre-secao-label {
+      font-size: 0.64rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gold);
+    }
+
+    /* Gauge */
+    .gauge-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .gauge-item { flex: 1; min-width: 180px; }
+    .gauge-lbl { font-size: 0.72rem; color: var(--muted); margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .gauge-lbl span:last-child { font-weight: 700; color: var(--text); }
+    .gauge-track { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .gauge-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .gauge-fill.green { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .gauge-fill.amber { background: linear-gradient(90deg, #e67e22, #f39c12); }
+    .gauge-fill.red   { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+
+    /* Alertas */
+    .alert-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px 18px; border-radius: var(--radius);
+      border-left: 4px solid transparent; margin-bottom: 12px;
+    }
+    .alert-item:last-child { margin-bottom: 0; }
+    .alert-item.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-item.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .alert-item.red   { background: var(--red-bg);   border-color: var(--red); }
+    .ai-icon  { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .ai-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .alert-item.green .ai-title { color: var(--green); }
+    .alert-item.amber .ai-title { color: var(--amber); }
+    .alert-item.red   .ai-title { color: var(--red); }
+    .ai-text  { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
+
+    .cta-footer {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 36px 32px; text-align: center; margin-top: 24px;
+    }
+    .cta-footer h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #fff; margin-bottom: 8px; }
+    .cta-footer p  { color: #8da9c4; font-size: 0.88rem; margin-bottom: 22px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .cta-footer a  {
+      display: inline-block; padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-weight: 700; font-size: 0.9rem;
+      border-radius: var(--radius); text-decoration: none;
+      transition: transform 0.15s; box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .conceito { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+  <a href="index.html" class="back-link">← Voltar ao Painel</a>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">Resultado do Exercício</p>
+  <h1>DRE <em>Simplificada</em></h1>
+  <p>Preencha as receitas e despesas do seu negócio e veja a Demonstração do Resultado formatada, com análise automática de cada linha.</p>
+</section>
+
+<div class="container">
+
+  <div class="conceito">
+    <div class="conceito-icon">📋</div>
+    <div>
+      <h2>O que é a DRE?</h2>
+      <p>
+        A <strong>Demonstração do Resultado do Exercício</strong> mostra, em ordem lógica, como a receita bruta
+        se transforma em lucro ou prejuízo líquido após deduzir todos os custos e despesas.
+        É o documento financeiro mais importante para entender <strong>se o negócio realmente ganha dinheiro</strong>
+        — e onde o dinheiro está vazando.
+        <br><br>
+        Todo empreendedor deveria ler sua DRE todo mês, mesmo que simplificada.
+      </p>
+    </div>
+  </div>
+
+  <!-- Formulário -->
+  <div class="card">
+    <div class="card-title">Dados do Período</div>
+
+    <!-- Receitas -->
+    <div class="grupo">
+      <div class="grupo-titulo"><span class="gt-icon">📥</span> Receitas</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="rec-bruta">Receita Bruta de Vendas</label>
+          <p class="hint">Total faturado antes de qualquer dedução.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="rec-bruta" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="devolucoes">Devoluções e Descontos</label>
+          <p class="hint">Mercadorias devolvidas e descontos concedidos.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="devolucoes" placeholder="0,00" min="0" step="10">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="impostos-vendas">Impostos sobre Vendas</label>
+          <p class="hint">Simples Nacional, ICMS, ISS, PIS, COFINS, etc.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="impostos-vendas" placeholder="0,00" min="0" step="10">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custos -->
+    <div class="grupo">
+      <div class="grupo-titulo"><span class="gt-icon">⚙️</span> Custos dos Produtos / Serviços (CPV/CSV)</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="cpv">Custo dos Produtos Vendidos</label>
+          <p class="hint">Matéria-prima, mercadorias, insumos diretos.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="cpv" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="mao-obra">Mão de Obra Direta</label>
+          <p class="hint">Salários de quem produz ou entrega o serviço.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="mao-obra" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="outros-cpv">Outros Custos Diretos</label>
+          <p class="hint">Fretes, embalagens, comissões de venda.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="outros-cpv" placeholder="0,00" min="0" step="50">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Despesas Operacionais -->
+    <div class="grupo">
+      <div class="grupo-titulo"><span class="gt-icon">🏢</span> Despesas Operacionais</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="aluguel">Aluguel / Sede</label>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="aluguel" placeholder="0,00" min="0" step="50">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="salarios-adm">Salários Administrativos</label>
+          <p class="hint">Inclua encargos (FGTS, INSS patronal).</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="salarios-adm" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="prolabore">Pró-labore dos Sócios</label>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="prolabore" placeholder="0,00" min="0" step="100">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="marketing">Marketing e Publicidade</label>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="marketing" placeholder="0,00" min="0" step="50">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="energia">Energia / Água / Internet</label>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="energia" placeholder="0,00" min="0" step="20">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="outros-desp">Outras Despesas Fixas</label>
+          <p class="hint">Assinaturas, seguros, contabilidade, etc.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="outros-desp" placeholder="0,00" min="0" step="50">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financeiro -->
+    <div class="grupo" style="margin-bottom:0">
+      <div class="grupo-titulo"><span class="gt-icon">🏦</span> Resultado Financeiro (opcional)</div>
+      <div class="input-grid">
+        <div class="input-group">
+          <label for="rec-financeira">Receitas Financeiras</label>
+          <p class="hint">Juros recebidos, rendimentos de aplicações.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="rec-financeira" placeholder="0,00" min="0" step="10">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="desp-financeira">Despesas Financeiras</label>
+          <p class="hint">Juros de empréstimos, tarifas bancárias, IOF.</p>
+          <div class="input-wrapper"><span class="prefix">R$</span>
+            <input type="number" id="desp-financeira" placeholder="0,00" min="0" step="10">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-calcular" onclick="calcular()">Gerar DRE</button>
+  </div>
+
+  <!-- Resultado -->
+  <div id="resultado">
+
+    <!-- KPIs -->
+    <div class="kpi-row" id="kpi-row"></div>
+
+    <!-- Gauges -->
+    <div class="card">
+      <div class="card-title">Indicadores de Margem</div>
+      <div class="gauge-row" id="gauge-row"></div>
+    </div>
+
+    <!-- DRE formatada -->
+    <div class="card">
+      <div class="card-title">Demonstração do Resultado do Exercício</div>
+      <table class="dre-table" id="dre-table"></table>
+    </div>
+
+    <!-- Análise -->
+    <div class="card">
+      <div class="card-title">Análise e Diagnóstico</div>
+      <div id="alertas-list"></div>
+    </div>
+
+  </div>
+
+  <div class="cta-footer">
+    <h3>Quer entender sua DRE real?</h3>
+    <p>Posso te ajudar a montar a DRE do seu negócio com os números reais e identificar onde o lucro está vazando.</p>
+    <a href="index.html#contato">Falar com o Consultor</a>
+  </div>
+
+</div>
+
+<script>
+  function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+  function fmt(val) {
+    return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function fmtPct(val) { return val.toFixed(1) + '%'; }
+  function cor(val) { return val >= 0 ? 'green' : 'red'; }
+
+  function calcular() {
+    // ── Coleta ──
+    const recBruta      = v('rec-bruta');
+    const devolucoes    = v('devolucoes');
+    const impostosVend  = v('impostos-vendas');
+    const cpv           = v('cpv');
+    const maoObra       = v('mao-obra');
+    const outrosCpv     = v('outros-cpv');
+    const aluguel       = v('aluguel');
+    const salariosAdm   = v('salarios-adm');
+    const prolabore     = v('prolabore');
+    const marketing     = v('marketing');
+    const energia       = v('energia');
+    const outrosDesp    = v('outros-desp');
+    const recFin        = v('rec-financeira');
+    const despFin       = v('desp-financeira');
+
+    if (recBruta <= 0) { alert('Informe a Receita Bruta de Vendas.'); return; }
+
+    // ── Cálculos ──
+    const deducoes      = devolucoes + impostosVend;
+    const recLiq        = recBruta - deducoes;
+    const totalCpv      = cpv + maoObra + outrosCpv;
+    const lucroBruto    = recLiq - totalCpv;
+    const totalDesp     = aluguel + salariosAdm + prolabore + marketing + energia + outrosDesp;
+    const lucroOp       = lucroBruto - totalDesp;
+    const resFinanceiro = recFin - despFin;
+    const lucroLiq      = lucroOp + resFinanceiro;
+
+    const pct = (val) => recBruta > 0 ? (val / recBruta) * 100 : 0;
+
+    const margBruta  = pct(lucroBruto);
+    const margOp     = pct(lucroOp);
+    const margLiq    = pct(lucroLiq);
+
+    // ── KPIs ──
+    const kpiRow = document.getElementById('kpi-row');
+    const kpis = [
+      { icon: '📊', label: 'Receita Líquida',    value: fmt(recLiq),    sub: fmtPct(pct(recLiq)) + ' da bruta', color: 'neutral' },
+      { icon: '💹', label: 'Lucro Bruto',        value: fmt(lucroBruto),sub: 'Margem ' + fmtPct(margBruta),  color: cor(lucroBruto) },
+      { icon: '🏢', label: 'Lucro Operacional',  value: fmt(lucroOp),   sub: 'Margem ' + fmtPct(margOp),     color: cor(lucroOp) },
+      { icon: lucroLiq >= 0 ? '✅' : '🚨', label: 'Lucro Líquido', value: fmt(lucroLiq), sub: 'Margem ' + fmtPct(margLiq), color: cor(lucroLiq) },
+    ];
+    kpiRow.innerHTML = kpis.map(k => `
+      <div class="kpi-card ${k.color}">
+        <div class="kpi-icon">${k.icon}</div>
+        <div class="kpi-label">${k.label}</div>
+        <div class="kpi-value">${k.value}</div>
+        <div class="kpi-sub">${k.sub}</div>
+      </div>`).join('');
+
+    // ── Gauges ──
+    const gauges = [
+      { label: 'Margem Bruta',       val: margBruta, color: margBruta >= 30 ? 'green' : margBruta >= 15 ? 'amber' : 'red' },
+      { label: 'Margem Operacional', val: margOp,    color: margOp   >= 15 ? 'green' : margOp   >= 5  ? 'amber' : 'red' },
+      { label: 'Margem Líquida',     val: margLiq,   color: margLiq  >= 10 ? 'green' : margLiq  >= 0  ? 'amber' : 'red' },
+    ];
+    document.getElementById('gauge-row').innerHTML = gauges.map(g => {
+      const width = Math.min(Math.max(g.val, 0), 100);
+      return `
+        <div class="gauge-item">
+          <div class="gauge-lbl"><span>${g.label}</span><span>${fmtPct(g.val)}</span></div>
+          <div class="gauge-track">
+            <div class="gauge-fill ${g.color}" style="width:0%" data-width="${width}"></div>
+          </div>
+        </div>`;
+    }).join('');
+    setTimeout(() => {
+      document.querySelectorAll('.gauge-fill[data-width]').forEach(el => {
+        el.style.width = el.dataset.width + '%';
+      });
+    }, 100);
+
+    // ── Tabela DRE ──
+    const linhas = [
+      { secao: 'RECEITAS' },
+      { label: 'Receita Bruta de Vendas',     valor: recBruta,     pct: pct(recBruta),    classe: 'dre-linha-receita' },
+      { label: '  (−) Devoluções e Descontos',valor: -devolucoes,  pct: pct(devolucoes),  classe: devolucoes > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Impostos sobre Vendas', valor: -impostosVend,pct: pct(impostosVend),classe: impostosVend > 0 ? 'dre-linha-negativo' : '' },
+      { label: '= Receita Líquida',           valor: recLiq,       pct: pct(recLiq),      classe: 'dre-linha-subtotal' },
+
+      { secao: 'CUSTOS DOS PRODUTOS / SERVIÇOS' },
+      { label: '  (−) Custo dos Produtos Vendidos', valor: -cpv,       pct: pct(cpv),       classe: cpv > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Mão de Obra Direta',          valor: -maoObra,   pct: pct(maoObra),   classe: maoObra > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Outros Custos Diretos',        valor: -outrosCpv, pct: pct(outrosCpv), classe: outrosCpv > 0 ? 'dre-linha-negativo' : '' },
+      { label: '= Lucro Bruto',               valor: lucroBruto,   pct: margBruta,        classe: `dre-linha-subtotal ${lucroBruto < 0 ? 'dre-linha-negativo' : 'dre-linha-positivo'}` },
+
+      { secao: 'DESPESAS OPERACIONAIS' },
+      { label: '  (−) Aluguel / Sede',              valor: -aluguel,    pct: pct(aluguel),    classe: aluguel > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Salários Administrativos',    valor: -salariosAdm,pct: pct(salariosAdm),classe: salariosAdm > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Pró-labore',                  valor: -prolabore,  pct: pct(prolabore),  classe: prolabore > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Marketing',                   valor: -marketing,  pct: pct(marketing),  classe: marketing > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Energia / Água / Internet',   valor: -energia,    pct: pct(energia),    classe: energia > 0 ? 'dre-linha-negativo' : '' },
+      { label: '  (−) Outras Despesas Fixas',       valor: -outrosDesp, pct: pct(outrosDesp), classe: outrosDesp > 0 ? 'dre-linha-negativo' : '' },
+      { label: '= Lucro Operacional (EBIT)',  valor: lucroOp,      pct: margOp,           classe: `dre-linha-subtotal ${lucroOp < 0 ? 'dre-linha-negativo' : 'dre-linha-positivo'}` },
+
+      { secao: 'RESULTADO FINANCEIRO' },
+      { label: '  (+) Receitas Financeiras',        valor: recFin,      pct: pct(recFin),     classe: recFin > 0 ? 'dre-linha-positivo' : '' },
+      { label: '  (−) Despesas Financeiras',        valor: -despFin,    pct: pct(despFin),    classe: despFin > 0 ? 'dre-linha-negativo' : '' },
+
+      { destaque: true, label: '= LUCRO LÍQUIDO DO PERÍODO', valor: lucroLiq, pct: margLiq },
+    ];
+
+    document.getElementById('dre-table').innerHTML = linhas.map(l => {
+      if (l.secao) return `
+        <tr class="dre-linha-secao">
+          <td colspan="3"><span class="dre-secao-label">${l.secao}</span></td>
+        </tr>`;
+      if (l.destaque) return `
+        <tr class="dre-linha-destaque">
+          <td class="td-label">${l.label}</td>
+          <td class="td-valor">${fmt(l.valor)}</td>
+          <td class="td-pct">${fmtPct(l.pct)}</td>
+        </tr>`;
+      // Linhas com valor zero ficam apagadas
+      const opacity = (l.valor === 0 || l.valor === -0) ? 'opacity:0.35' : '';
+      return `
+        <tr class="${l.classe || ''}" style="${opacity}">
+          <td class="td-label">${l.label}</td>
+          <td class="td-valor">${fmt(l.valor)}</td>
+          <td class="td-pct">${fmtPct(Math.abs(l.pct))}</td>
+        </tr>`;
+    }).join('');
+
+    // ── Alertas ──
+    const alertas = [];
+
+    if (lucroLiq < 0) {
+      alertas.push({ color: 'red', icon: '🚨', title: 'Prejuízo Líquido Identificado',
+        text: `O negócio encerrou o período com déficit de <strong>${fmt(Math.abs(lucroLiq))}</strong>. ` +
+              `As despesas totais superam a receita líquida. Revise os maiores blocos de custo antes de qualquer outra decisão.` });
+    } else if (margLiq < 10) {
+      alertas.push({ color: 'amber', icon: '⚠️', title: `Margem Líquida Crítica — ${fmtPct(margLiq)}`,
+        text: `Abaixo de 10% de margem líquida, qualquer queda de faturamento ou custo imprevisto coloca o negócio no vermelho. ` +
+              `Meta de curto prazo: chegar a pelo menos 10%.` });
+    } else {
+      alertas.push({ color: 'green', icon: '✅', title: `Lucro Líquido Positivo — Margem de ${fmtPct(margLiq)}`,
+        text: `O negócio gerou lucro no período. Continue monitorando mensalmente para garantir que a tendência se mantém.` });
+    }
+
+    if (lucroBruto < 0) {
+      alertas.push({ color: 'red', icon: '📦', title: 'Lucro Bruto Negativo — Problema no Custo do Produto',
+        text: `Seus custos diretos superam a receita líquida. Isso significa que você está vendendo <strong>abaixo do custo</strong>. ` +
+              `Revise a precificação e o CPV com urgência — nenhuma redução de despesa operacional resolverá esse problema.` });
+    } else if (margBruta < 30) {
+      alertas.push({ color: 'amber', icon: '📦', title: `Margem Bruta Baixa — ${fmtPct(margBruta)}`,
+        text: `Margem bruta abaixo de 30% significa que os custos diretos consomem mais de 70% da receita líquida. ` +
+              `Há pouco espaço para cobrir despesas operacionais. Avalie precificação e renegociação de fornecedores.` });
+    }
+
+    if (totalDesp > 0 && (totalDesp / recLiq) * 100 > 40) {
+      alertas.push({ color: 'amber', icon: '🏢', title: 'Despesas Operacionais Elevadas',
+        text: `As despesas operacionais representam <strong>${fmtPct((totalDesp / recLiq) * 100)}</strong> da receita líquida. ` +
+              `O ideal é manter abaixo de 40%. Revise especialmente os maiores itens fixos.` });
+    }
+
+    if (despFin > 0 && (despFin / recBruta) * 100 > 5) {
+      alertas.push({ color: 'amber', icon: '🏦', title: 'Despesas Financeiras Relevantes',
+        text: `Juros e encargos financeiros representam <strong>${fmtPct((despFin / recBruta) * 100)}</strong> do faturamento. ` +
+              `Dívidas caras consomem margem operacional. Priorize quitá-las antes de novos investimentos.` });
+    }
+
+    if (margLiq >= 20) {
+      alertas.push({ color: 'green', icon: '🚀', title: 'Margem Excelente — Hora de Reinvestir',
+        text: `Com ${fmtPct(margLiq)} de margem líquida, o negócio está em posição sólida. ` +
+              `Considere reservar parte do lucro (mín. 3 meses de custos fixos = ${fmt(totalDesp * 3)}) antes de expandir.` });
+    }
+
+    document.getElementById('alertas-list').innerHTML = alertas.map(a => `
+      <div class="alert-item ${a.color}">
+        <div class="ai-icon">${a.icon}</div>
+        <div>
+          <div class="ai-title">${a.title}</div>
+          <div class="ai-text">${a.text}</div>
+        </div>
+      </div>`).join('');
+
+    const res = document.getElementById('resultado');
+    res.classList.add('visible');
+    setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+</script>
+</body>
+</html>
