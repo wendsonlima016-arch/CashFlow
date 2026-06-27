@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Desconto | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --green:      #1a7a4a;
+      --green-bg:   #eafaf1;
+      --green-bd:   #a3e4c1;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ee;
+      --red-bd:     #f1a9a0;
+      --amber:      #d4820a;
+      --amber-bg:   #fef9ee;
+      --amber-bd:   #f5d08a;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .site-header {
+      background: var(--navy); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; text-decoration: none; }
+    .brand span { color: var(--gold-light); }
+    .back-link { font-size: 0.8rem; color: var(--gold-light); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 1; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center; padding: 56px 24px 48px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px);
+    }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 14px; position: relative; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #fff; line-height: 1.2; margin-bottom: 14px; position: relative; }
+    .hero h1 em { font-style: normal; color: var(--gold-light); }
+    .hero p { color: #8da9c4; font-size: 1rem; max-width: 540px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    .conceito {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 28px 32px; margin-bottom: 24px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .conceito-icon { font-size: 2.2rem; flex-shrink: 0; margin-top: 2px; }
+    .conceito h2 { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--gold-light); margin-bottom: 8px; }
+    .conceito p { font-size: 0.86rem; color: #8da9c4; line-height: 1.65; }
+    .conceito strong { color: #fff; }
+    .formula-box {
+      background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3);
+      border-radius: var(--radius); padding: 12px 18px; margin-top: 14px;
+      font-size: 0.85rem; color: var(--gold-light); font-weight: 600; text-align: center;
+    }
+
+    .card {
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08); padding: 32px; margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Modo toggle */
+    .modo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .modo-btn {
+      padding: 11px; border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 0.83rem; font-weight: 600;
+      cursor: pointer; background: #f8fafc; color: var(--muted); transition: all 0.15s;
+    }
+    .modo-btn.active { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .modo-btn:hover:not(.active) { border-color: var(--gold); }
+
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
+    .input-group { display: flex; flex-direction: column; gap: 7px; }
+    .input-group label { font-size: 0.82rem; font-weight: 600; color: var(--navy-mid); }
+    .input-group .hint { font-size: 0.7rem; color: var(--muted); line-height: 1.4; }
+
+    .input-wrapper { position: relative; }
+    .input-wrapper .prefix {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-weight: 600; font-size: 0.88rem; color: var(--muted); pointer-events: none;
+    }
+    .input-wrapper input {
+      width: 100%; padding: 12px 12px 12px 36px;
+      border: 1.5px solid var(--border); border-radius: var(--radius);
+      font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500;
+      color: var(--text); background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+    }
+    .input-wrapper input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.15); background: #fff;
+    }
+
+    .btn-calcular {
+      display: block; width: 100%; margin-top: 24px; padding: 15px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-family: 'Inter', sans-serif; font-size: 1rem;
+      font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(201,168,76,0.35);
+    }
+    .btn-calcular:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
+
+    #resultado { display: none; }
+    #resultado.visible { display: block; }
+
+    /* Cards de destaque */
+    .destaque-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 560px) { .destaque-grid { grid-template-columns: 1fr; } }
+
+    .dest-card {
+      border-radius: var(--radius-lg); padding: 24px 20px; text-align: center; border: 2px solid transparent;
+    }
+    .dest-card.original { background: #f0f4f8; border-color: var(--border); }
+    .dest-card.novo     { background: var(--navy); border-color: var(--gold); }
+    .dest-card.perda    { background: var(--red-bg); border-color: var(--red-bd); }
+    .dest-label { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px; }
+    .dest-card.original .dest-label { color: var(--muted); }
+    .dest-card.novo     .dest-label { color: var(--gold); }
+    .dest-card.perda    .dest-label { color: var(--red); }
+    .dest-value { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem, 3.5vw, 2.2rem); line-height: 1.1; margin-bottom: 6px; }
+    .dest-card.original .dest-value { color: var(--navy-mid); }
+    .dest-card.novo     .dest-value { color: var(--gold-light); }
+    .dest-card.perda    .dest-value { color: var(--red); }
+    .dest-sub { font-size: 0.78rem; }
+    .dest-card.original .dest-sub { color: var(--muted); }
+    .dest-card.novo     .dest-sub { color: #8da9c4; }
+    .dest-card.perda    .dest-sub { color: var(--muted); }
+
+    /* KPIs */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 640px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+
+    .kpi-mini {
+      background: var(--surface); border-radius: var(--radius); padding: 16px 14px;
+      border: 1.5px solid var(--border); box-shadow: 0 1px 6px rgba(11,37,69,0.05);
+    }
+    .km-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .km-value { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy-mid); }
+    .km-value.red   { color: var(--red); }
+    .km-value.green { color: var(--green); }
+    .km-value.amber { color: var(--amber); }
+    .km-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+
+    /* Barra comparativa */
+    .comp-section { margin-bottom: 0; }
+    .comp-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .comp-row:last-child { margin-bottom: 0; }
+    .comp-label { font-size: 0.78rem; color: var(--text); min-width: 140px; }
+    .comp-track { flex: 1; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .comp-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+    .comp-fill.navy  { background: var(--navy-mid); }
+    .comp-fill.red   { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+    .comp-fill.green { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .comp-val { font-size: 0.8rem; font-weight: 700; color: var(--text); min-width: 80px; text-align: right; }
+
+    /* Tabela de volume compensatório */
+    .vol-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .vol-table thead th {
+      text-align: left; padding: 9px 12px;
+      font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 2px solid var(--border); background: #f8fafc;
+    }
+    .vol-table tbody tr { border-bottom: 1px solid var(--border); }
+    .vol-table tbody tr:last-child { border-bottom: none; }
+    .vol-table tbody td { padding: 9px 12px; }
+    .td-desc  { color: var(--text); font-weight: 500; }
+    .td-extra { color: var(--red); font-weight: 700; }
+    .td-total { color: var(--navy-mid); font-weight: 600; }
+    .td-viavel { font-size: 0.75rem; }
+    .td-viavel.sim { color: var(--green); font-weight: 700; }
+    .td-viavel.nao { color: var(--red); font-weight: 700; }
+
+    /* Alertas */
+    .alert-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px 18px; border-radius: var(--radius);
+      border-left: 4px solid transparent; margin-bottom: 12px;
+    }
+    .alert-item:last-child { margin-bottom: 0; }
+    .alert-item.green { background: var(--green-bg); border-color: var(--green); }
+    .alert-item.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .alert-item.red   { background: var(--red-bg);   border-color: var(--red); }
+    .ai-icon  { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+    .ai-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+    .alert-item.green .ai-title { color: var(--green); }
+    .alert-item.amber .ai-title { color: var(--amber); }
+    .alert-item.red   .ai-title { color: var(--red); }
+    .ai-text  { font-size: 0.82rem; color: var(--text); line-height: 1.55; }
+
+    .cta-footer {
+      background: var(--navy); border-radius: var(--radius-lg);
+      padding: 36px 32px; text-align: center; margin-top: 24px;
+    }
+    .cta-footer h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #fff; margin-bottom: 8px; }
+    .cta-footer p  { color: #8da9c4; font-size: 0.88rem; margin-bottom: 22px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .cta-footer a  {
+      display: inline-block; padding: 13px 32px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: var(--navy); font-weight: 700; font-size: 0.9rem;
+      border-radius: var(--radius); text-decoration: none;
+      transition: transform 0.15s; box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+    }
+    .cta-footer a:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .conceito { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+  <a href="index.html" class="back-link">← Voltar ao Painel</a>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">Precificação e Vendas</p>
+  <h1>Calculadora de <em>Desconto</em></h1>
+  <p>Descubra o impacto real de cada desconto na sua margem — e quantas vendas a mais você precisa fazer para compensar.</p>
+</section>
+
+<div class="container">
+
+  <div class="conceito">
+    <div class="conceito-icon">🏷️</div>
+    <div>
+      <h2>O desconto custa mais do que parece</h2>
+      <p>
+        Um desconto de <strong>10% no preço</strong> não significa perder 10% do lucro.
+        Se sua margem for de 30%, esse desconto consome <strong>um terço do seu lucro líquido</strong>.
+        Com margem de 20%, você precisa vender <strong>100% a mais</strong> para compensar um desconto de 20%.
+        <br><br>
+        Simule antes de dar desconto. Os números vão te surpreender.
+      </p>
+      <div class="formula-box">
+        Vendas extras necessárias = Desconto% ÷ (Margem% − Desconto%) × 100
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Dados da Simulação</div>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:0.82rem;font-weight:600;color:var(--navy-mid);display:block;margin-bottom:10px;">O que você quer calcular?</label>
+      <div class="modo-row">
+        <button class="modo-btn active" id="btn-impacto" onclick="setModo('impacto')">📉 Impacto do Desconto na Margem</button>
+        <button class="modo-btn"        id="btn-volume"  onclick="setModo('volume')">📦 Volume Necessário para Compensar</button>
+      </div>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="preco">Preço de Venda Original</label>
+        <p class="hint">Preço cheio sem desconto.</p>
+        <div class="input-wrapper"><span class="prefix">R$</span>
+          <input type="number" id="preco" placeholder="0,00" min="0.01" step="1">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="custo">Custo do Produto / Serviço</label>
+        <p class="hint">Custo direto para entregar.</p>
+        <div class="input-wrapper"><span class="prefix">R$</span>
+          <input type="number" id="custo" placeholder="0,00" min="0.01" step="1">
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="desconto">Desconto Oferecido</label>
+        <p class="hint">Percentual de desconto sobre o preço.</p>
+        <div class="input-wrapper"><span class="prefix">%</span>
+          <input type="number" id="desconto" placeholder="0,0" min="0.1" max="99" step="0.5">
+        </div>
+      </div>
+      <div class="input-group" id="grupo-qtd">
+        <label for="qtd-atual">Quantidade Vendida Atual</label>
+        <p class="hint">Quantas unidades você vende por mês.</p>
+        <div class="input-wrapper"><span class="prefix">un</span>
+          <input type="number" id="qtd-atual" placeholder="0" min="1" step="1">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-calcular" onclick="calcular()">Calcular Impacto do Desconto</button>
+  </div>
+
+  <div id="resultado">
+
+    <!-- Destaque -->
+    <div class="destaque-grid" id="destaque-grid"></div>
+
+    <!-- KPIs -->
+    <div class="kpi-row" id="kpi-row"></div>
+
+    <!-- Barra comparativa -->
+    <div class="card">
+      <div class="card-title">Comparativo Antes e Depois do Desconto</div>
+      <div class="comp-section" id="comp-section"></div>
+    </div>
+
+    <!-- Tabela de volume compensatório -->
+    <div class="card" id="card-volume">
+      <div class="card-title">Volume Necessário para Compensar</div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">
+        Para manter o mesmo lucro total de antes do desconto, você precisaria vender a quantidade abaixo em cada cenário:
+      </p>
+      <div style="overflow-x:auto;">
+        <table class="vol-table">
+          <thead>
+            <tr>
+              <th>Desconto</th>
+              <th>Margem após desconto</th>
+              <th>Vendas extras necessárias</th>
+              <th>Total de unidades</th>
+              <th>Viável?</th>
+            </tr>
+          </thead>
+          <tbody id="vol-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="card">
+      <div class="card-title">Diagnóstico</div>
+      <div id="alertas-list"></div>
+    </div>
+
+  </div>
+
+  <div class="cta-footer">
+    <h3>Sua política de descontos está correta?</h3>
+    <p>Posso te ajudar a definir um limite máximo de desconto por produto sem comprometer a rentabilidade do negócio.</p>
+    <a href="index.html#contato">Falar com o Consultor</a>
+  </div>
+
+</div>
+
+<script>
+  let modoAtivo = 'impacto';
+
+  function setModo(m) {
+    modoAtivo = m;
+    document.getElementById('btn-impacto').className = 'modo-btn' + (m === 'impacto' ? ' active' : '');
+    document.getElementById('btn-volume').className  = 'modo-btn' + (m === 'volume'  ? ' active' : '');
+    document.getElementById('grupo-qtd').style.display = m === 'volume' ? 'flex' : 'none';
+    document.querySelector('.btn-calcular').textContent =
+      m === 'impacto' ? 'Calcular Impacto do Desconto' : 'Calcular Volume Necessário';
+  }
+  // Esconde qtd por padrão
+  document.getElementById('grupo-qtd').style.display = 'none';
+
+  function fmt(v)    { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+  function fmtPct(v) { return v.toFixed(1) + '%'; }
+  function fmtN(v)   { return Math.ceil(v).toLocaleString('pt-BR'); }
+
+  function calcular() {
+    const preco    = parseFloat(document.getElementById('preco').value)    || 0;
+    const custo    = parseFloat(document.getElementById('custo').value)    || 0;
+    const descPct  = parseFloat(document.getElementById('desconto').value) || 0;
+    const qtdAtual = parseFloat(document.getElementById('qtd-atual').value)|| 0;
+
+    if (preco  <= 0) { alert('Informe o preço de venda.'); return; }
+    if (custo  <= 0) { alert('Informe o custo do produto.'); return; }
+    if (custo  >= preco) { alert('O custo não pode ser maior ou igual ao preço de venda.'); return; }
+    if (descPct <= 0) { alert('Informe o percentual de desconto.'); return; }
+    if (modoAtivo === 'volume' && qtdAtual <= 0) { alert('Informe a quantidade vendida atual.'); return; }
+
+    // ── Cálculos base ──
+    const lucroOriginal   = preco - custo;
+    const margemOriginal  = (lucroOriginal / preco) * 100;
+
+    const precoDesconto   = preco * (1 - descPct / 100);
+    const lucroDesconto   = precoDesconto - custo;
+    const margemDesconto  = lucroDesconto > 0 ? (lucroDesconto / precoDesconto) * 100 : 0;
+
+    const perdaAbsoluta   = lucroOriginal - lucroDesconto;
+    const perdaRelativa   = (perdaAbsoluta / lucroOriginal) * 100;
+
+    // Vendas extras para compensar (fórmula do ponto de indiferença)
+    const vendasExtras    = lucroDesconto > 0
+      ? (descPct / (margemOriginal - descPct)) * 100
+      : Infinity;
+
+    // ── Destaque ──
+    document.getElementById('destaque-grid').innerHTML = `
+      <div class="dest-card original">
+        <div class="dest-label">Preço Original</div>
+        <div class="dest-value">${fmt(preco)}</div>
+        <div class="dest-sub">Margem ${fmtPct(margemOriginal)}</div>
+      </div>
+      <div class="dest-card novo">
+        <div class="dest-label">Preço com Desconto</div>
+        <div class="dest-value">${fmt(precoDesconto)}</div>
+        <div class="dest-sub">Margem ${lucroDesconto > 0 ? fmtPct(margemDesconto) : '⚠️ Prejuízo'}</div>
+      </div>
+      <div class="dest-card perda">
+        <div class="dest-label">Lucro Perdido por Venda</div>
+        <div class="dest-value">${fmt(perdaAbsoluta)}</div>
+        <div class="dest-sub">${fmtPct(perdaRelativa)} do lucro original</div>
+      </div>`;
+
+    // ── KPIs ──
+    document.getElementById('kpi-row').innerHTML = `
+      <div class="kpi-mini">
+        <div class="km-label">Lucro original / un</div>
+        <div class="km-value">${fmt(lucroOriginal)}</div>
+        <div class="km-sub">${fmtPct(margemOriginal)} de margem</div>
+      </div>
+      <div class="kpi-mini">
+        <div class="km-label">Lucro após desconto / un</div>
+        <div class="km-value ${lucroDesconto > 0 ? 'green' : 'red'}">${fmt(lucroDesconto)}</div>
+        <div class="km-sub">${lucroDesconto > 0 ? fmtPct(margemDesconto) + ' de margem' : 'Venda no prejuízo'}</div>
+      </div>
+      <div class="kpi-mini">
+        <div class="km-label">Queda na margem</div>
+        <div class="km-value red">−${fmtPct(margemOriginal - (lucroDesconto > 0 ? margemDesconto : 0))}</div>
+        <div class="km-sub">em pontos percentuais</div>
+      </div>
+      <div class="kpi-mini">
+        <div class="km-label">Vendas extras p/ compensar</div>
+        <div class="km-value ${vendasExtras === Infinity ? 'red' : vendasExtras > 100 ? 'amber' : 'green'}">
+          ${vendasExtras === Infinity ? '∞' : '+' + fmtPct(vendasExtras)}
+        </div>
+        <div class="km-sub">${vendasExtras === Infinity ? 'Impossível compensar' : 'a mais no volume'}</div>
+      </div>`;
+
+    // ── Barras comparativas ──
+    const maxVal = Math.max(preco, precoDesconto, lucroOriginal, Math.max(lucroDesconto, 0));
+    document.getElementById('comp-section').innerHTML = [
+      { label: 'Preço de venda',   val: preco,        color: 'navy',  fmt: fmt(preco) },
+      { label: 'Preço c/ desconto',val: precoDesconto, color: 'red',   fmt: fmt(precoDesconto) },
+      { label: 'Lucro original',   val: lucroOriginal, color: 'green', fmt: fmt(lucroOriginal) },
+      { label: 'Lucro c/ desconto',val: Math.max(lucroDesconto, 0), color: lucroDesconto > 0 ? 'green' : 'red', fmt: fmt(lucroDesconto) },
+    ].map(r => `
+      <div class="comp-row">
+        <span class="comp-label">${r.label}</span>
+        <div class="comp-track">
+          <div class="comp-fill ${r.color}" data-w="${(r.val / maxVal) * 100}" style="width:0%"></div>
+        </div>
+        <span class="comp-val">${r.fmt}</span>
+      </div>`).join('');
+
+    setTimeout(() => {
+      document.querySelectorAll('.comp-fill[data-w]').forEach(el => {
+        el.style.width = el.dataset.w + '%';
+      });
+    }, 100);
+
+    // ── Tabela de volume ──
+    const descontos = [5, 10, 15, 20, descPct].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
+    document.getElementById('vol-body').innerHTML = descontos.map(d => {
+      const pD  = preco * (1 - d / 100);
+      const lD  = pD - custo;
+      const mD  = lD > 0 ? (lD / pD) * 100 : 0;
+      const ext = lD > 0 ? (d / (margemOriginal - d)) * 100 : Infinity;
+      const qtdNec = qtdAtual > 0 && ext !== Infinity ? qtdAtual * (1 + ext / 100) : null;
+      const viavel  = ext !== Infinity && ext <= 50;
+      const isAtual = d === descPct;
+      return `<tr style="${isAtual ? 'background:rgba(201,168,76,0.08);font-weight:600' : ''}">
+        <td class="td-desc">${d}%${isAtual ? ' ← atual' : ''}</td>
+        <td>${lD > 0 ? fmtPct(mD) : '<span style="color:var(--red)">Prejuízo</span>'}</td>
+        <td class="td-extra">${ext === Infinity ? '∞ (impossível)' : '+' + fmtPct(ext)}</td>
+        <td class="td-total">${qtdNec ? fmtN(qtdNec) + ' un' : '—'}</td>
+        <td class="td-viavel ${viavel ? 'sim' : 'nao'}">${lD <= 0 ? '❌ Prejuízo' : viavel ? '✅ Viável' : '⚠️ Difícil'}</td>
+      </tr>`;
+    }).join('');
+
+    // ── Alertas ──
+    const alertas = [];
+
+    if (lucroDesconto <= 0) {
+      alertas.push({ color: 'red', icon: '🚨', title: 'Desconto Gera Prejuízo por Venda',
+        text: `Com ${fmtPct(descPct)} de desconto, o preço (${fmt(precoDesconto)}) fica abaixo do custo (${fmt(custo)}). Cada venda com esse desconto representa uma perda direta de ${fmt(Math.abs(lucroDesconto))}.` });
+    } else if (perdaRelativa > 50) {
+      alertas.push({ color: 'red', icon: '📉', title: `Desconto Destrói ${fmtPct(perdaRelativa)} do Lucro`,
+        text: `Um desconto de ${fmtPct(descPct)} consome mais da metade do lucro por unidade. Para manter o resultado total, você precisaria vender ${vendasExtras === Infinity ? 'infinitamente mais' : fmtPct(vendasExtras) + ' a mais'} — o que raramente acontece só por causa de desconto.` });
+    } else if (perdaRelativa > 25) {
+      alertas.push({ color: 'amber', icon: '⚠️', title: `Desconto Consome ${fmtPct(perdaRelativa)} do Lucro`,
+        text: `O desconto é significativo. Certifique-se de que o aumento de volume esperado justifica a perda de margem. Em geral, descontos acima de 10% raramente geram o volume extra necessário para compensar.` });
+    } else {
+      alertas.push({ color: 'green', icon: '✅', title: 'Desconto Controlado',
+        text: `${fmtPct(descPct)} de desconto consome ${fmtPct(perdaRelativa)} do lucro — dentro de um nível administrável. Monitore se o volume extra esperado está se concretizando.` });
+    }
+
+    if (vendasExtras !== Infinity && vendasExtras > 100) {
+      alertas.push({ color: 'red', icon: '📦', title: `Precisaria Dobrar as Vendas para Compensar`,
+        text: `Para manter o mesmo lucro total, você precisaria vender ${fmtPct(vendasExtras)} a mais. Na prática, um desconto raramente gera esse volume adicional — o que significa que o resultado final será pior.` });
+    }
+
+    if (margemOriginal < 20) {
+      alertas.push({ color: 'amber', icon: '💡', title: 'Margem Original Já Era Baixa',
+        text: `Com apenas ${fmtPct(margemOriginal)} de margem no preço cheio, qualquer desconto tem impacto desproporcional. Antes de oferecer desconto, avalie se não é possível aumentar o valor percebido do produto para justificar o preço cheio.` });
+    }
+
+    document.getElementById('alertas-list').innerHTML = alertas.map(a => `
+      <div class="alert-item ${a.color}">
+        <div class="ai-icon">${a.icon}</div>
+        <div>
+          <div class="ai-title">${a.title}</div>
+          <div class="ai-text">${a.text}</div>
+        </div>
+      </div>`).join('');
+
+    const res = document.getElementById('resultado');
+    res.classList.add('visible');
+    setTimeout(() => { res.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+</script>
+</body>
+</html>
