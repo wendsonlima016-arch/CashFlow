@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade | Cash-Flow</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+    :root {
+      --navy:       #0b2545;
+      --navy-mid:   #134074;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96e;
+      --surface:    #ffffff;
+      --bg:         #f0f4f8;
+      --text:       #1c2b3a;
+      --muted:      #6b7f94;
+      --border:     #dce6ef;
+      --radius:     12px;
+      --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    .site-header {
+      background: var(--navy); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--gold);
+    }
+    .brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; text-decoration: none; }
+    .brand span { color: var(--gold-light); }
+    .back-link { font-size: 0.8rem; color: var(--gold-light); text-decoration: none; opacity: 0.85; transition: opacity 0.2s; }
+    .back-link:hover { opacity: 1; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      text-align: center; padding: 56px 24px 48px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,168,76,0.04) 60px, rgba(201,168,76,0.04) 61px);
+    }
+    .hero-eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 14px; position: relative; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); color: #fff; line-height: 1.2; margin-bottom: 14px; position: relative; }
+    .hero p { color: #8da9c4; font-size: 0.95rem; max-width: 480px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+    .container { max-width: 760px; margin: 0 auto; padding: 40px 20px 64px; }
+
+    .doc-card {
+      background: var(--surface); border-radius: var(--radius-lg);
+      box-shadow: 0 2px 16px rgba(11,37,69,0.08); padding: 40px 44px;
+    }
+    @media (max-width: 600px) { .doc-card { padding: 24px 20px; } }
+
+    .doc-meta {
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 32px;
+      padding-bottom: 20px; border-bottom: 1.5px solid var(--border);
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .doc-meta span strong { color: var(--text); }
+
+    h2 {
+      font-family: 'DM Serif Display', serif; font-size: 1.2rem;
+      color: var(--navy); margin: 32px 0 12px; line-height: 1.3;
+    }
+    h2:first-of-type { margin-top: 0; }
+
+    p { font-size: 0.9rem; color: var(--text); line-height: 1.75; margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul { padding-left: 20px; margin-bottom: 14px; }
+    ul li { font-size: 0.9rem; color: var(--text); line-height: 1.75; margin-bottom: 6px; }
+
+    .highlight {
+      background: #f8fafc; border-left: 3px solid var(--gold);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px; margin: 20px 0;
+      font-size: 0.88rem; color: var(--text); line-height: 1.65;
+    }
+
+    .secao-divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+    .contato-box {
+      background: var(--navy); border-radius: var(--radius);
+      padding: 20px 24px; margin-top: 32px;
+    }
+    .contato-box p { color: #8da9c4; margin-bottom: 8px; }
+    .contato-box p:last-child { margin-bottom: 0; }
+    .contato-box strong { color: var(--gold-light); }
+    .contato-box a { color: var(--gold-light); }
+
+    .site-footer {
+      background: var(--navy); border-top: 1px solid rgba(201,168,76,0.2);
+      padding: 24px; text-align: center; margin-top: 0;
+    }
+    .site-footer p { color: #8da9c4; font-size: 0.8rem; }
+    .site-footer strong { color: var(--gold-light); }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="brand">Cash<span>-Flow</span></a>
+  <a href="index.html" class="back-link">← Voltar ao Painel</a>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">Transparência e Segurança</p>
+  <h1>Política de Privacidade</h1>
+  <p>Como coletamos, usamos e protegemos suas informações em conformidade com a LGPD.</p>
+</section>
+
+<div class="container">
+  <div class="doc-card">
+
+    <div class="doc-meta">
+      <span><strong>Versão:</strong> 1.0</span>
+      <span><strong>Última atualização:</strong> Junho de 2026</span>
+      <span><strong>Responsável:</strong> Wendson Lima — Cash-Flow</span>
+    </div>
+
+    <h2>1. Quem somos</h2>
+    <p>
+      O <strong>Cash-Flow</strong> é um projeto de ferramentas financeiras gratuitas e consultoria financeira
+      desenvolvido por <strong>Wendson Lima</strong>, estudante de Administração pelo IFAC.
+      Esta Política de Privacidade descreve como tratamos as informações coletadas através do nosso site.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>2. Quais dados coletamos</h2>
+    <p>Coletamos apenas os dados que você nos fornece voluntariamente através do formulário de contato:</p>
+    <ul>
+      <li><strong>Nome completo</strong> — para identificação no atendimento</li>
+      <li><strong>Número de WhatsApp</strong> — para retorno de contato</li>
+      <li><strong>Segmento do negócio</strong> — para personalizar o atendimento</li>
+      <li><strong>Mensagem</strong> — descrição da sua necessidade</li>
+    </ul>
+
+    <div class="highlight">
+      <strong>Importante:</strong> As ferramentas financeiras do site (simuladores, calculadoras, fluxo de caixa, DRE, etc.)
+      funcionam inteiramente no seu navegador. Nenhum dado inserido nessas ferramentas é enviado, armazenado
+      ou acessado por nós. Seus números financeiros ficam apenas no seu dispositivo.
+    </div>
+
+    <div class="secao-divider"></div>
+
+    <h2>3. Para que usamos seus dados</h2>
+    <p>Os dados coletados pelo formulário de contato são usados exclusivamente para:</p>
+    <ul>
+      <li>Responder à sua mensagem via WhatsApp</li>
+      <li>Oferecer o diagnóstico financeiro solicitado</li>
+      <li>Prestar os serviços de consultoria contratados</li>
+    </ul>
+    <p>
+      Não utilizamos seus dados para envio de publicidade não solicitada, não os vendemos
+      e não os compartilhamos com terceiros para fins comerciais.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>4. Base legal para o tratamento</h2>
+    <p>
+      O tratamento dos seus dados é fundamentado no <strong>artigo 7º da Lei nº 13.709/2018 (LGPD)</strong>,
+      especificamente nos incisos:
+    </p>
+    <ul>
+      <li><strong>Inciso I</strong> — consentimento do titular, fornecido ao preencher e enviar o formulário</li>
+      <li><strong>Inciso V</strong> — execução de contrato ou procedimentos preliminares ao contrato, quando aplicável</li>
+    </ul>
+
+    <div class="secao-divider"></div>
+
+    <h2>5. Por quanto tempo guardamos seus dados</h2>
+    <p>
+      As informações de contato são mantidas apenas pelo tempo necessário para prestar o atendimento solicitado.
+      Caso você solicite a exclusão dos seus dados, providenciaremos a remoção em até <strong>15 dias úteis</strong>.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>6. Cookies e rastreamento</h2>
+    <p>
+      O site Cash-Flow <strong>não utiliza cookies de rastreamento, pixels de publicidade
+      ou ferramentas de analytics</strong> de terceiros. Não monitoramos seu comportamento de navegação
+      nem compartilhamos dados com plataformas de anúncios.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>7. Compartilhamento de dados</h2>
+    <p>
+      Seus dados <strong>não são vendidos, alugados ou compartilhados</strong> com terceiros,
+      exceto nas seguintes situações:
+    </p>
+    <ul>
+      <li>Por obrigação legal ou ordem judicial</li>
+      <li>Para proteção dos direitos do titular ou de terceiros em situação de emergência</li>
+    </ul>
+
+    <div class="secao-divider"></div>
+
+    <h2>8. Seus direitos como titular</h2>
+    <p>De acordo com a LGPD, você tem direito a:</p>
+    <ul>
+      <li><strong>Acesso</strong> — saber quais dados seus estão em nossa posse</li>
+      <li><strong>Correção</strong> — solicitar a atualização de dados incorretos</li>
+      <li><strong>Exclusão</strong> — pedir a remoção dos seus dados</li>
+      <li><strong>Revogação do consentimento</strong> — retirar sua autorização a qualquer momento</li>
+      <li><strong>Portabilidade</strong> — receber seus dados em formato legível</li>
+      <li><strong>Informação</strong> — saber com quem seus dados são compartilhados</li>
+    </ul>
+    <p>Para exercer qualquer um desses direitos, entre em contato pelo WhatsApp ou e-mail abaixo.</p>
+
+    <div class="secao-divider"></div>
+
+    <h2>9. Segurança dos dados</h2>
+    <p>
+      Adotamos medidas técnicas adequadas para proteger suas informações contra acesso não autorizado,
+      perda ou divulgação indevida. A comunicação via WhatsApp conta com criptografia de ponta a ponta
+      oferecida pela própria plataforma.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>10. Links externos</h2>
+    <p>
+      O site pode conter links para plataformas externas (como WhatsApp). Não nos responsabilizamos
+      pelas políticas de privacidade dessas plataformas. Recomendamos que você leia as políticas
+      de cada serviço que utilizar.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>11. Alterações nesta política</h2>
+    <p>
+      Esta política pode ser atualizada periodicamente. Alterações relevantes serão comunicadas
+      através do próprio site. A data da última atualização está sempre indicada no topo deste documento.
+    </p>
+
+    <div class="secao-divider"></div>
+
+    <h2>12. Contato e solicitações</h2>
+    <p>Para exercer seus direitos, tirar dúvidas ou solicitar a exclusão dos seus dados:</p>
+
+    <div class="contato-box">
+      <p><strong>Responsável:</strong> Wendson Lima</p>
+      <p><strong>Projeto:</strong> Cash-Flow — Ferramentas Financeiras</p>
+      <!-- PREENCHA: substitua pelo seu número e e-mail -->
+      <p><strong>WhatsApp:</strong> <a href="https://wa.me/5568999999999" target="_blank">(68) 9 9999-9999</a></p>
+      <p><strong>E-mail:</strong> seuemail@email.com</p>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>&copy; 2026 <strong>Cash-Flow</strong> · Todos os direitos reservados.</p>
+</footer>
+
+</body>
+</html>
